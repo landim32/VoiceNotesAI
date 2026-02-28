@@ -1,0 +1,63 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  DOTNET_VERSION: '8.0.x'
+  PROJECT_PATH: src/VoiceNotesAI/VoiceNotesAI.csproj
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Install MAUI workload
+        run: dotnet workload install maui-android
+
+      - name: Setup Java JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'microsoft'
+          java-version: '17'
+
+      - name: Create appsettings.json from secret
+        run: |
+          cat > src/VoiceNotesAI/appsettings.json << 'SETTINGS'
+          {
+            "OpenAI": {
+              "ApiKey": "${{ secrets.OPENAI_API_KEY }}",
+              "Model": "gpt-4o",
+              "WhisperModel": "whisper-1"
+            }
+          }
+          SETTINGS
+
+      - name: Restore dependencies
+        run: dotnet restore ${{ env.PROJECT_PATH }}
+
+      - name: Build APK
+        run: >
+          dotnet publish ${{ env.PROJECT_PATH }}
+          -c Release
+          -f net8.0-android
+          -o output
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: VoiceNotesAI-APK
+          path: output/**/*-Signed.apk
+          if-no-files-found: warn
