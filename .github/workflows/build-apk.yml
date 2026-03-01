@@ -29,7 +29,7 @@ jobs:
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
 
-    - name: Verify .NET SDK
+    - name: Pin .NET 8 SDK only
       run: |
         echo "Installed SDKs:"
         dotnet --list-sdks
@@ -58,7 +58,7 @@ jobs:
         echo "NuGetVersionV2: ${{ steps.gitversion.outputs.nuGetVersionV2 }}"
 
     - name: Restore dependencies
-      run: dotnet restore VoiceNotesAI/VoiceNotesAI.csproj
+      run: dotnet restore VoiceNotesAI/VoiceNotesAI.csproj -p:CheckEolTargetFramework=false
 
     # ============================================================
     # SIGNING (descomente quando tiver o keystore configurado)
@@ -93,6 +93,7 @@ jobs:
           -f net8.0-android \
           -c Release \
           -p:AndroidPackageFormat=apk \
+          -p:CheckEolTargetFramework=false \
           -p:ApplicationDisplayVersion=${{ steps.gitversion.outputs.nuGetVersionV2 }} \
           -p:ApplicationVersion=${{ github.run_number }}
 
