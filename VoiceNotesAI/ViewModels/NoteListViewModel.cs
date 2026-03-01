@@ -9,14 +9,19 @@ namespace VoiceNotesAI.ViewModels;
 public partial class NoteListViewModel : ObservableObject
 {
     private readonly INoteRepository _noteRepository;
+    private readonly ICategoryRepository _categoryRepository;
 
-    public NoteListViewModel(INoteRepository noteRepository)
+    public NoteListViewModel(INoteRepository noteRepository, ICategoryRepository categoryRepository)
     {
         _noteRepository = noteRepository;
+        _categoryRepository = categoryRepository;
     }
 
     [ObservableProperty]
     private ObservableCollection<Note> _notes = [];
+
+    [ObservableProperty]
+    private ObservableCollection<string> _filterCategories = [];
 
     [ObservableProperty]
     private string _selectedCategory = string.Empty;
@@ -34,6 +39,8 @@ public partial class NoteListViewModel : ObservableObject
 
         try
         {
+            await LoadCategoriesAsync();
+
             List<Note> noteList;
 
             if (string.IsNullOrEmpty(SelectedCategory))
@@ -48,6 +55,14 @@ public partial class NoteListViewModel : ObservableObject
         {
             IsLoading = false;
         }
+    }
+
+    private async Task LoadCategoriesAsync()
+    {
+        var categories = await _categoryRepository.GetAllAsync();
+        FilterCategories = new ObservableCollection<string>(
+            new[] { "" }.Concat(categories.Select(c => c.Name))
+        );
     }
 
     [RelayCommand]

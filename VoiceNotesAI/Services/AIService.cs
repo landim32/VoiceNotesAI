@@ -11,14 +11,12 @@ public class AIService : IAIService
     private const string ChatEndpoint = "https://api.openai.com/v1/chat/completions";
 
     private readonly HttpClient _httpClient;
-    private readonly string _apiKey;
-    private readonly string _model;
+    private readonly OpenAISettings _settings;
 
-    public AIService(HttpClient httpClient, string apiKey, string model = "gpt-4o")
+    public AIService(HttpClient httpClient, OpenAISettings settings)
     {
         _httpClient = httpClient;
-        _apiKey = apiKey;
-        _model = model;
+        _settings = settings;
     }
 
     public async Task<NoteResult> InterpretNoteAsync(string transcribedText)
@@ -27,7 +25,7 @@ public class AIService : IAIService
 
         var requestBody = new
         {
-            model = _model,
+            model = _settings.Model,
             messages = new[]
             {
                 new { role = "user", content = prompt }
@@ -38,7 +36,7 @@ public class AIService : IAIService
         var json = JsonSerializer.Serialize(requestBody);
 
         using var request = new HttpRequestMessage(HttpMethod.Post, ChatEndpoint);
-        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _apiKey);
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _settings.ApiKey);
         request.Content = new StringContent(json, Encoding.UTF8, "application/json");
 
         var response = await _httpClient.SendAsync(request);

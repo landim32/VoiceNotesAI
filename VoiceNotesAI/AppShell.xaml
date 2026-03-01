@@ -4,13 +4,44 @@
        xmlns:pages="clr-namespace:VoiceNotesAI.Pages"
        x:Class="VoiceNotesAI.AppShell"
        Title="VoiceNotes AI"
-       Shell.BackgroundColor="{AppThemeBinding Light=#6750A4, Dark=#1C1B1F}"
-       Shell.ForegroundColor="{AppThemeBinding Light=White, Dark=#D0BCFF}"
-       Shell.TitleColor="{AppThemeBinding Light=White, Dark=#D0BCFF}">
+       FlyoutBehavior="Flyout"
+       Shell.BackgroundColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Gray950}}"
+       Shell.ForegroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Primary}}"
+       Shell.TitleColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Primary}}"
+       FlyoutBackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}">
 
-    <ShellContent
-        Title="Notas"
-        ContentTemplate="{DataTemplate pages:NoteListPage}"
-        Route="NoteListPage" />
+    <Shell.FlyoutHeader>
+        <Grid HeightRequest="140"
+              BackgroundColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Accent}}"
+              Padding="20">
+            <VerticalStackLayout VerticalOptions="End" Spacing="4">
+                <Label Text="VoiceNotes AI"
+                       FontSize="22"
+                       FontAttributes="Bold"
+                       TextColor="{StaticResource White}" />
+                <Label Text="Suas notas de voz inteligentes"
+                       FontSize="13"
+                       TextColor="#80FFFFFF" />
+            </VerticalStackLayout>
+        </Grid>
+    </Shell.FlyoutHeader>
+
+    <FlyoutItem Title="Notas" Icon="icon_notes.png">
+        <ShellContent
+            ContentTemplate="{DataTemplate pages:NoteListPage}"
+            Route="NoteListPage" />
+    </FlyoutItem>
+
+    <FlyoutItem Title="Categorias" Icon="icon_categories.png">
+        <ShellContent
+            ContentTemplate="{DataTemplate pages:CategoryListPage}"
+            Route="CategoryListPage" />
+    </FlyoutItem>
+
+    <FlyoutItem Title="Configurações" Icon="icon_settings.png">
+        <ShellContent
+            ContentTemplate="{DataTemplate pages:SettingsPage}"
+            Route="SettingsPage" />
+    </FlyoutItem>
 
 </Shell>

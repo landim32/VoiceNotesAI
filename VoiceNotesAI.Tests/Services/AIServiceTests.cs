@@ -3,12 +3,18 @@ using System.Text;
 using System.Text.Json;
 using Moq;
 using Moq.Protected;
+using VoiceNotesAI.Helpers;
 using VoiceNotesAI.Services;
 
 namespace VoiceNotesAI.Tests.Services;
 
 public class AIServiceTests
 {
+    private static OpenAISettings CreateSettings(string apiKey = "test-key", string model = "gpt-4o")
+    {
+        return new OpenAISettings { ApiKey = apiKey, Model = model };
+    }
+
     private static HttpClient CreateMockHttpClient(HttpStatusCode statusCode, string responseContent)
     {
         var handler = new Mock<HttpMessageHandler>();
@@ -60,7 +66,7 @@ public class AIServiceTests
             "Tarefas");
 
         var httpClient = CreateMockHttpClient(HttpStatusCode.OK, responseJson);
-        var service = new AIService(httpClient, "test-key", "gpt-4o");
+        var service = new AIService(httpClient, CreateSettings());
 
         var result = await service.InterpretNoteAsync("preciso comprar leite");
 
@@ -90,7 +96,7 @@ public class AIServiceTests
             });
 
         var httpClient = new HttpClient(handler.Object);
-        var service = new AIService(httpClient, "my-secret-key", "gpt-4o");
+        var service = new AIService(httpClient, CreateSettings(apiKey: "my-secret-key"));
 
         await service.InterpretNoteAsync("texto teste");
 
@@ -123,7 +129,7 @@ public class AIServiceTests
             });
 
         var httpClient = new HttpClient(handler.Object);
-        var service = new AIService(httpClient, "key", "gpt-4o-mini");
+        var service = new AIService(httpClient, CreateSettings(model: "gpt-4o-mini"));
 
         await service.InterpretNoteAsync("teste");
 
@@ -135,7 +141,7 @@ public class AIServiceTests
     public async Task InterpretNoteAsync_ApiError_ShouldThrowHttpRequestException()
     {
         var httpClient = CreateMockHttpClient(HttpStatusCode.Unauthorized, "Unauthorized");
-        var service = new AIService(httpClient, "invalid-key");
+        var service = new AIService(httpClient, CreateSettings(apiKey: "invalid-key"));
 
         await Assert.ThrowsAsync<HttpRequestException>(
             () => service.InterpretNoteAsync("texto"));
@@ -159,7 +165,7 @@ public class AIServiceTests
         });
 
         var httpClient = CreateMockHttpClient(HttpStatusCode.OK, responseJson);
-        var service = new AIService(httpClient, "key");
+        var service = new AIService(httpClient, CreateSettings());
 
         await Assert.ThrowsAsync<InvalidOperationException>(
             () => service.InterpretNoteAsync("texto"));
@@ -183,7 +189,7 @@ public class AIServiceTests
         });
 
         var httpClient = CreateMockHttpClient(HttpStatusCode.OK, responseJson);
-        var service = new AIService(httpClient, "key");
+        var service = new AIService(httpClient, CreateSettings());
 
         await Assert.ThrowsAsync<JsonException>(
             () => service.InterpretNoteAsync("texto"));

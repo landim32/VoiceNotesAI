@@ -14,6 +14,8 @@
             <converters:InvertedBoolConverter x:Key="InvertedBoolConverter" />
             <converters:RecordButtonTextConverter x:Key="RecordButtonTextConverter" />
             <converters:RecordButtonColorConverter x:Key="RecordButtonColorConverter" />
+            <converters:IsNotZeroConverter x:Key="IsNotZeroConverter" />
+            <converters:CategoryFilterTextConverter x:Key="CategoryFilterTextConverter" />
 
             <!-- Chip Button Style -->
             <Style x:Key="ChipButton" TargetType="Button">
@@ -21,8 +23,8 @@
                 <Setter Property="HeightRequest" Value="34" />
                 <Setter Property="CornerRadius" Value="17" />
                 <Setter Property="Padding" Value="14,0" />
-                <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=#EDE7F6, Dark=#2D2040}" />
-                <Setter Property="TextColor" Value="{AppThemeBinding Light=#6750A4, Dark=#D0BCFF}" />
+                <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=#FDE8E0, Dark=#2A1510}" />
+                <Setter Property="TextColor" Value="{AppThemeBinding Light=#F07040, Dark=#F8A080}" />
             </Style>
         </ResourceDictionary>
     </Application.Resources>

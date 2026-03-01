@@ -2,17 +2,23 @@ using System.Net;
 using System.Text;
 using Moq;
 using Moq.Protected;
+using VoiceNotesAI.Helpers;
 using VoiceNotesAI.Services;
 
 namespace VoiceNotesAI.Tests.Services;
 
 public class SpeechToTextServiceTests
 {
+    private static OpenAISettings CreateSettings(string apiKey = "test-key", string whisperModel = "whisper-1")
+    {
+        return new OpenAISettings { ApiKey = apiKey, WhisperModel = whisperModel };
+    }
+
     [Fact]
     public async Task TranscribeAsync_FileNotFound_ShouldThrowFileNotFoundException()
     {
         var httpClient = new HttpClient();
-        var service = new SpeechToTextService(httpClient, "test-key");
+        var service = new SpeechToTextService(httpClient, CreateSettings());
 
         await Assert.ThrowsAsync<FileNotFoundException>(
             () => service.TranscribeAsync("/path/that/does/not/exist.wav"));
@@ -21,7 +27,6 @@ public class SpeechToTextServiceTests
     [Fact]
     public async Task TranscribeAsync_ValidFile_ShouldReturnTranscribedText()
     {
-        // Create a temp audio file
         var tempFile = Path.GetTempFileName();
         await File.WriteAllBytesAsync(tempFile, new byte[] { 0x00, 0x01, 0x02 });
 
@@ -43,7 +48,7 @@ public class SpeechToTextServiceTests
                 });
 
             var httpClient = new HttpClient(handler.Object);
-            var service = new SpeechToTextService(httpClient, "test-key", "whisper-1");
+            var service = new SpeechToTextService(httpClient, CreateSettings());
 
             var result = await service.TranscribeAsync(tempFile);
 
@@ -79,7 +84,7 @@ public class SpeechToTextServiceTests
                 });
 
             var httpClient = new HttpClient(handler.Object);
-            var service = new SpeechToTextService(httpClient, "my-whisper-key");
+            var service = new SpeechToTextService(httpClient, CreateSettings(apiKey: "my-whisper-key"));
 
             await service.TranscribeAsync(tempFile);
 
@@ -115,7 +120,7 @@ public class SpeechToTextServiceTests
                 });
 
             var httpClient = new HttpClient(handler.Object);
-            var service = new SpeechToTextService(httpClient, "key");
+            var service = new SpeechToTextService(httpClient, CreateSettings());
 
             await Assert.ThrowsAsync<HttpRequestException>(
                 () => service.TranscribeAsync(tempFile));

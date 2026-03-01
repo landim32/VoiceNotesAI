@@ -28,7 +28,7 @@ public partial class RecordingViewModel : ObservableObject
     private bool _isProcessing;
 
     [ObservableProperty]
-    private string _statusMessage = "Toque para gravar";
+    private string _statusMessage = "Iniciando gravação...";
 
     [ObservableProperty]
     private string _audioFilePath = string.Empty;
@@ -37,14 +37,6 @@ public partial class RecordingViewModel : ObservableObject
     private string _transcribedText = string.Empty;
 
     [RelayCommand]
-    private async Task ToggleRecordingAsync()
-    {
-        if (IsRecording)
-            await StopRecordingAsync();
-        else
-            await StartRecordingAsync();
-    }
-
     private async Task StartRecordingAsync()
     {
         var status = await Permissions.RequestAsync<Permissions.Microphone>();
@@ -59,14 +51,17 @@ public partial class RecordingViewModel : ObservableObject
         StatusMessage = "Gravando... Toque para parar";
     }
 
+    [RelayCommand]
     private async Task StopRecordingAsync()
     {
+        if (!IsRecording) return;
+
         AudioFilePath = await _audioService.StopRecordingAsync();
         IsRecording = false;
-        StatusMessage = "Gravação finalizada";
+
+        await ProcessAudioAsync();
     }
 
-    [RelayCommand]
     private async Task ProcessAudioAsync()
     {
         if (string.IsNullOrEmpty(AudioFilePath))

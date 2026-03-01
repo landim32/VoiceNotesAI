@@ -34,7 +34,8 @@ public class AudioService : IAudioService
             return string.Empty;
 
         var source = await _recorder.StopAsync();
-        source.Dispose();
+        if (source is IDisposable disposable)
+            disposable.Dispose();
 
         return _currentFilePath;
     }

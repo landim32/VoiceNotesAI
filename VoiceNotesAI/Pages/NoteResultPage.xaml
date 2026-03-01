@@ -41,10 +41,10 @@
                        FontAttributes="Bold"
                        TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}" />
                 <Picker Title="Selecione a categoria"
+                        ItemsSource="{Binding AvailableCategories}"
                         SelectedItem="{Binding Category}"
                         TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}"
-                        BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}"
-                        x:Name="CategoryPicker" />
+                        BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}" />
             </VerticalStackLayout>
 
             <!-- Description -->

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:VoiceNotesAI.ViewModels"
+             x:Class="VoiceNotesAI.Pages.CategoryDetailPage"
+             x:DataType="vm:CategoryDetailViewModel"
+             Title="Categoria"
+             BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}">
+
+    <ScrollView Padding="20">
+        <VerticalStackLayout Spacing="16">
+
+            <!-- Name -->
+            <VerticalStackLayout Spacing="4">
+                <Label Text="Nome"
+                       FontSize="13"
+                       FontAttributes="Bold"
+                       TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}" />
+                <Entry Text="{Binding Name}"
+                       Placeholder="Nome da categoria"
+                       FontSize="16"
+                       BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}"
+                       TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}"
+                       PlaceholderColor="{StaticResource Gray400}" />
+            </VerticalStackLayout>
+
+            <!-- Action Buttons -->
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="12" Margin="0,12,0,0">
+                <Button Grid.Column="0"
+                        Text="Excluir"
+                        Command="{Binding DeleteCommand}"
+                        IsVisible="{Binding CategoryId, Converter={StaticResource IsNotZeroConverter}}"
+                        FontSize="15"
+                        HeightRequest="50"
+                        CornerRadius="25"
+                        BackgroundColor="#E53935"
+                        TextColor="{StaticResource White}" />
+
+                <Button Grid.Column="1"
+                        Text="Salvar"
+                        Command="{Binding SaveCommand}"
+                        IsEnabled="{Binding IsSaving, Converter={StaticResource InvertedBoolConverter}}"
+                        FontSize="15"
+                        FontAttributes="Bold"
+                        HeightRequest="50"
+                        CornerRadius="25"
+                        BackgroundColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"
+                        TextColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Black}}" />
+            </Grid>
+
+            <!-- Saving Indicator -->
+            <ActivityIndicator IsRunning="{Binding IsSaving}"
+                               IsVisible="{Binding IsSaving}"
+                               Color="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}" />
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

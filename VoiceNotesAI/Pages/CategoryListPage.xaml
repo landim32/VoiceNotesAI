@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:VoiceNotesAI.ViewModels"
+             xmlns:models="clr-namespace:VoiceNotesAI.Models"
+             x:Class="VoiceNotesAI.Pages.CategoryListPage"
+             x:DataType="vm:CategoryListViewModel"
+             Title="Categorias"
+             BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}">
+
+    <Grid RowDefinitions="*,Auto" Padding="16">
+
+        <!-- Loading Indicator -->
+        <ActivityIndicator Grid.Row="0"
+                           IsRunning="{Binding IsLoading}"
+                           IsVisible="{Binding IsLoading}"
+                           Color="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center" />
+
+        <!-- Empty State -->
+        <VerticalStackLayout Grid.Row="0"
+                             IsVisible="{Binding IsEmpty}"
+                             VerticalOptions="Center"
+                             HorizontalOptions="Center"
+                             Spacing="12">
+            <Label Text="📂"
+                   FontSize="48"
+                   HorizontalOptions="Center" />
+            <Label Text="Nenhuma categoria"
+                   FontSize="18"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center"
+                   TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}" />
+            <Label Text="Adicione sua primeira categoria!"
+                   FontSize="14"
+                   HorizontalOptions="Center"
+                   TextColor="{AppThemeBinding Light={StaticResource Gray400}, Dark={StaticResource Gray400}}" />
+        </VerticalStackLayout>
+
+        <!-- Categories List -->
+        <CollectionView Grid.Row="0"
+                        ItemsSource="{Binding Categories}"
+                        IsVisible="{Binding IsLoading, Converter={StaticResource InvertedBoolConverter}}"
+                        SelectionMode="None">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:Category">
+                    <SwipeView>
+                        <SwipeView.RightItems>
+                            <SwipeItems>
+                                <SwipeItem Text="Excluir"
+                                           BackgroundColor="#E53935"
+                                           Command="{Binding Source={RelativeSource AncestorType={x:Type vm:CategoryListViewModel}}, Path=DeleteCommand}"
+                                           CommandParameter="{Binding}" />
+                            </SwipeItems>
+                        </SwipeView.RightItems>
+
+                        <Frame Margin="0,4"
+                               Padding="16"
+                               CornerRadius="12"
+                               BorderColor="Transparent"
+                               BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}">
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:CategoryListViewModel}}, Path=GoToDetailCommand}"
+                                    CommandParameter="{Binding}" />
+                            </Frame.GestureRecognizers>
+
+                            <Label Text="{Binding Name}"
+                                   FontSize="16"
+                                   FontAttributes="Bold"
+                                   TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}"
+                                   VerticalOptions="Center" />
+                        </Frame>
+                    </SwipeView>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <!-- FAB Add Button -->
+        <Button Grid.Row="1"
+                Text="＋  Nova Categoria"
+                Command="{Binding AddCategoryCommand}"
+                FontSize="16"
+                FontAttributes="Bold"
+                HeightRequest="56"
+                CornerRadius="28"
+                Margin="0,12,0,0"
+                BackgroundColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"
+                TextColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Black}}" />
+    </Grid>
+
+</ContentPage>

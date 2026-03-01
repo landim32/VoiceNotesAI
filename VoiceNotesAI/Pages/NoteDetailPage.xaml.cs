@@ -4,11 +4,17 @@ namespace VoiceNotesAI.Pages;
 
 public partial class NoteDetailPage : ContentPage
 {
+    private readonly NoteDetailViewModel _viewModel;
+
     public NoteDetailPage(NoteDetailViewModel viewModel)
     {
         InitializeComponent();
-        BindingContext = viewModel;
+        BindingContext = _viewModel = viewModel;
+    }
 
-        CategoryPicker.ItemsSource = NoteDetailViewModel.AvailableCategories;
+    protected override async void OnAppearing()
+    {
+        base.OnAppearing();
+        await _viewModel.LoadCategoriesCommand.ExecuteAsync(null);
     }
 }

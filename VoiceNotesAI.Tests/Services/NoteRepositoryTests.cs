@@ -18,11 +18,11 @@ public class NoteRepositoryTests : IAsyncLifetime
         _repository = new NoteRepository(_database);
     }
 
-    public Task DisposeAsync()
+    public async Task DisposeAsync()
     {
+        await _database.Connection.CloseAsync();
         if (File.Exists(_dbPath))
             File.Delete(_dbPath);
-        return Task.CompletedTask;
     }
 
     [Fact]

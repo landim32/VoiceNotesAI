@@ -7,7 +7,7 @@
              Title="Gravar Nota"
              BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}">
 
-    <Grid RowDefinitions="*,Auto,Auto,Auto" Padding="24">
+    <Grid RowDefinitions="*,Auto,Auto" Padding="24">
 
         <!-- Visual Feedback Area -->
         <VerticalStackLayout Grid.Row="0"
@@ -22,7 +22,7 @@
                    Padding="0"
                    BorderColor="Transparent"
                    HorizontalOptions="Center"
-                   BackgroundColor="{AppThemeBinding Light=#EDE7F6, Dark=#2D2040}">
+                   BackgroundColor="{AppThemeBinding Light=#FDE8E0, Dark=#2A1510}">
                 <Label Text="🎙️"
                        FontSize="60"
                        HorizontalOptions="Center"
@@ -50,31 +50,18 @@
                    TextColor="{AppThemeBinding Light={StaticResource Gray400}, Dark={StaticResource Gray400}}" />
         </VerticalStackLayout>
 
-        <!-- Record/Stop Button -->
+        <!-- Stop Button (only visible while recording) -->
         <Button Grid.Row="2"
-                Text="{Binding IsRecording, Converter={StaticResource RecordButtonTextConverter}}"
-                Command="{Binding ToggleRecordingCommand}"
-                IsEnabled="{Binding IsProcessing, Converter={StaticResource InvertedBoolConverter}}"
+                Text="⏹  Parar Gravação"
+                Command="{Binding StopRecordingCommand}"
+                IsVisible="{Binding IsRecording}"
                 FontSize="18"
                 FontAttributes="Bold"
                 HeightRequest="60"
                 CornerRadius="30"
-                Margin="0,0,0,12"
-                BackgroundColor="{Binding IsRecording, Converter={StaticResource RecordButtonColorConverter}}"
-                TextColor="{StaticResource White}" />
-
-        <!-- Process Button -->
-        <Button Grid.Row="3"
-                Text="Processar Áudio"
-                Command="{Binding ProcessAudioCommand}"
-                IsVisible="{Binding IsRecording, Converter={StaticResource InvertedBoolConverter}}"
-                IsEnabled="{Binding IsProcessing, Converter={StaticResource InvertedBoolConverter}}"
-                FontSize="16"
-                HeightRequest="50"
-                CornerRadius="25"
                 Margin="0,0,0,16"
-                BackgroundColor="{AppThemeBinding Light={StaticResource Secondary}, Dark={StaticResource SecondaryDark}}"
-                TextColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Black}}" />
+                BackgroundColor="#E53935"
+                TextColor="{StaticResource White}" />
     </Grid>
 
 </ContentPage>

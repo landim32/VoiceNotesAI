@@ -30,6 +30,11 @@
     <Compile Include="..\VoiceNotesAI\Services\ISpeechToTextService.cs" Link="LinkedSources\Services\ISpeechToTextService.cs" />
     <Compile Include="..\VoiceNotesAI\Services\INoteRepository.cs" Link="LinkedSources\Services\INoteRepository.cs" />
     <Compile Include="..\VoiceNotesAI\Services\NoteRepository.cs" Link="LinkedSources\Services\NoteRepository.cs" />
+    <Compile Include="..\VoiceNotesAI\Services\ICategoryRepository.cs" Link="LinkedSources\Services\ICategoryRepository.cs" />
+    <Compile Include="..\VoiceNotesAI\Services\CategoryRepository.cs" Link="LinkedSources\Services\CategoryRepository.cs" />
+    <Compile Include="..\VoiceNotesAI\Services\ISettingsRepository.cs" Link="LinkedSources\Services\ISettingsRepository.cs" />
+    <Compile Include="..\VoiceNotesAI\Services\SettingsRepository.cs" Link="LinkedSources\Services\SettingsRepository.cs" />
+    <Compile Include="..\VoiceNotesAI\Models\AppSetting.cs" Link="LinkedSources\Models\AppSetting.cs" />
     <Compile Include="..\VoiceNotesAI\Services\AIService.cs" Link="LinkedSources\Services\AIService.cs" />
     <Compile Include="..\VoiceNotesAI\Services\SpeechToTextService.cs" Link="LinkedSources\Services\SpeechToTextService.cs" />
   </ItemGroup>

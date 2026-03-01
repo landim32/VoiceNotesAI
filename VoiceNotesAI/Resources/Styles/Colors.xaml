@@ -3,23 +3,32 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
 
-    <Color x:Key="Primary">#6750A4</Color>
-    <Color x:Key="PrimaryDark">#D0BCFF</Color>
-    <Color x:Key="Secondary">#625B71</Color>
-    <Color x:Key="SecondaryDark">#CCC2DC</Color>
-    <Color x:Key="Tertiary">#7D5260</Color>
-    <Color x:Key="TertiaryDark">#EFB8C8</Color>
+    <!-- Brand Colors -->
+    <Color x:Key="Primary">#F07040</Color>
+    <Color x:Key="PrimaryDark">#F07040</Color>
+    <Color x:Key="PrimaryLight">#F8A080</Color>
+    <Color x:Key="Secondary">#E0E0E0</Color>
+    <Color x:Key="SecondaryDark">#B0B0B0</Color>
+    <Color x:Key="Accent">#101020</Color>
+    <Color x:Key="AccentOrange">#F07000</Color>
+    <Color x:Key="AccentTeal">#80C0D0</Color>
+    <Color x:Key="Tertiary">#80C0D0</Color>
+    <Color x:Key="TertiaryDark">#80C0D0</Color>
 
+    <!-- Neutrals -->
     <Color x:Key="White">#FFFFFF</Color>
     <Color x:Key="Black">#000000</Color>
 
-    <Color x:Key="Gray100">#E1E1E1</Color>
-    <Color x:Key="Gray200">#C8C8C8</Color>
-    <Color x:Key="Gray300">#ACACAC</Color>
-    <Color x:Key="Gray400">#919191</Color>
-    <Color x:Key="Gray500">#6E6E6E</Color>
-    <Color x:Key="Gray600">#404040</Color>
-    <Color x:Key="Gray900">#212121</Color>
-    <Color x:Key="Gray950">#141414</Color>
+    <Color x:Key="Gray100">#F5F5F5</Color>
+    <Color x:Key="Gray200">#E0E0E0</Color>
+    <Color x:Key="Gray300">#BDBDBD</Color>
+    <Color x:Key="Gray400">#9E9E9E</Color>
+    <Color x:Key="Gray500">#757575</Color>
+    <Color x:Key="Gray600">#424242</Color>
+    <Color x:Key="Gray900">#1A1A2E</Color>
+    <Color x:Key="Gray950">#101020</Color>
+
+    <!-- Semantic -->
+    <Color x:Key="Danger">#E53935</Color>
 
 </ResourceDictionary>

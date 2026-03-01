@@ -48,34 +48,31 @@ public static class MauiProgram
         builder.Services.AddSingleton<IAudioService, AudioService>();
 
         // AI Services
-        builder.Services.AddSingleton<ISpeechToTextService>(sp =>
-        {
-            var http = sp.GetRequiredService<HttpClient>();
-            var settings = sp.GetRequiredService<OpenAISettings>();
-            return new SpeechToTextService(http, settings.ApiKey, settings.WhisperModel);
-        });
-
-        builder.Services.AddSingleton<IAIService>(sp =>
-        {
-            var http = sp.GetRequiredService<HttpClient>();
-            var settings = sp.GetRequiredService<OpenAISettings>();
-            return new AIService(http, settings.ApiKey, settings.Model);
-        });
+        builder.Services.AddSingleton<ISpeechToTextService, SpeechToTextService>();
+        builder.Services.AddSingleton<IAIService, AIService>();
 
         // Repositories
         builder.Services.AddSingleton<INoteRepository, NoteRepository>();
+        builder.Services.AddSingleton<ICategoryRepository, CategoryRepository>();
+        builder.Services.AddSingleton<ISettingsRepository, SettingsRepository>();
 
         // ViewModels
         builder.Services.AddTransient<NoteListViewModel>();
         builder.Services.AddTransient<RecordingViewModel>();
         builder.Services.AddTransient<NoteResultViewModel>();
         builder.Services.AddTransient<NoteDetailViewModel>();
+        builder.Services.AddTransient<CategoryListViewModel>();
+        builder.Services.AddTransient<CategoryDetailViewModel>();
+        builder.Services.AddTransient<SettingsViewModel>();
 
         // Pages
         builder.Services.AddTransient<NoteListPage>();
         builder.Services.AddTransient<RecordingPage>();
         builder.Services.AddTransient<NoteResultPage>();
         builder.Services.AddTransient<NoteDetailPage>();
+        builder.Services.AddTransient<CategoryListPage>();
+        builder.Services.AddTransient<CategoryDetailPage>();
+        builder.Services.AddTransient<SettingsPage>();
 
 #if DEBUG
         builder.Logging.AddDebug();

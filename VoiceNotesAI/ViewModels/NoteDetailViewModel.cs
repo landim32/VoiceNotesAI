@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using VoiceNotesAI.Models;
@@ -8,10 +9,12 @@ namespace VoiceNotesAI.ViewModels;
 public partial class NoteDetailViewModel : ObservableObject, IQueryAttributable
 {
     private readonly INoteRepository _noteRepository;
+    private readonly ICategoryRepository _categoryRepository;
 
-    public NoteDetailViewModel(INoteRepository noteRepository)
+    public NoteDetailViewModel(INoteRepository noteRepository, ICategoryRepository categoryRepository)
     {
         _noteRepository = noteRepository;
+        _categoryRepository = categoryRepository;
     }
 
     [ObservableProperty]
@@ -35,10 +38,8 @@ public partial class NoteDetailViewModel : ObservableObject, IQueryAttributable
     [ObservableProperty]
     private bool _isSaving;
 
-    public static readonly string[] AvailableCategories =
-    [
-        "Tarefas", "Ideias", "Lembretes", "Trabalho", "Pessoal", "Outros"
-    ];
+    [ObservableProperty]
+    private ObservableCollection<string> _availableCategories = [];
 
     public void ApplyQueryAttributes(IDictionary<string, object> query)
     {
@@ -51,6 +52,13 @@ public partial class NoteDetailViewModel : ObservableObject, IQueryAttributable
             AudioFilePath = note.AudioFilePath;
             CreatedAt = note.CreatedAt;
         }
+    }
+
+    [RelayCommand]
+    private async Task LoadCategoriesAsync()
+    {
+        var categories = await _categoryRepository.GetAllAsync();
+        AvailableCategories = new ObservableCollection<string>(categories.Select(c => c.Name));
     }
 
     [RelayCommand]
