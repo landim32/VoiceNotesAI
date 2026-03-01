@@ -1,0 +1,60 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Project Overview
+
+VoiceNotesAI is a .NET MAUI Android app (net8.0-android) that records voice notes and structures them automatically using OpenAI's Whisper (speech-to-text) and GPT-4 (note interpretation) APIs. The UI and prompts are in Portuguese (Brazil).
+
+## Build & Test Commands
+
+```bash
+# Build entire solution
+dotnet build VoiceNotesAI.sln
+
+# Run all tests
+dotnet test VoiceNotesAI.Tests/VoiceNotesAI.Tests.csproj
+
+# Run a single test by name
+dotnet test VoiceNotesAI.Tests/VoiceNotesAI.Tests.csproj --filter "FullyQualifiedName~TestMethodName"
+
+# Build Android APK (release)
+dotnet publish VoiceNotesAI/VoiceNotesAI.csproj -c Release -f net8.0-android -o output
+
+# First-time setup: install MAUI workload
+dotnet workload install maui-android
+```
+
+## Architecture
+
+**MVVM pattern** with CommunityToolkit.Mvvm source generators, dependency injection via `MauiProgram.cs`, and interface-based services.
+
+### Core Flow
+Recording (AudioService) → Transcription (SpeechToTextService → Whisper API) → Interpretation (AIService → GPT-4) → Storage (NoteRepository → SQLite)
+
+### Key Layers
+
+- **Models/** — `Note` (SQLite entity), `NoteResult` (AI response DTO), `Category`
+- **Services/** — All behind interfaces (`IAudioService`, `ISpeechToTextService`, `IAIService`, `INoteRepository`) for testability. HTTP calls use injected `HttpClient`.
+- **ViewModels/** — `RecordingViewModel`, `NoteListViewModel`, `NoteDetailViewModel`, `NoteResultViewModel`. Use `[ObservableProperty]` and `[RelayCommand]` attributes.
+- **Pages/** — XAML pages bound to ViewModels. Shell navigation defined in `AppShell.xaml`.
+- **Data/AppDatabase.cs** — SQLiteAsyncConnection wrapper; seeds 6 default categories on first run.
+- **Helpers/PromptTemplates.cs** — System prompt for GPT-4 note structuring (in Portuguese).
+
+### DI Registration (MauiProgram.cs)
+- **Singleton:** `OpenAISettings`, `AppDatabase`, `HttpClient`, `AudioManager`
+- **Transient:** All Pages, ViewModels, and Services
+
+## Configuration
+
+OpenAI API settings are in `appsettings.json` (gitignored). See `appsettings.example.json` for the schema. The file is embedded as a build resource and loaded from the assembly manifest at runtime.
+
+## Testing
+
+- **Framework:** xUnit + Moq
+- **Pattern:** Services tested by mocking `HttpMessageHandler`; repository tests use temporary SQLite databases with `IAsyncLifetime` for setup/teardown.
+- Tests live in `VoiceNotesAI.Tests/` mirroring the main project structure (Services/, Models/, Helpers/).
+
+## CI/CD
+
+GitHub Actions workflow (`.github/workflows/build-apk.yml`) builds the Android APK on push to main/develop and on PRs. Requires .NET 8.0 SDK and JDK 17.
