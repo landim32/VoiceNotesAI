@@ -10,7 +10,7 @@
 
 **VoiceNotes AI** is a .NET MAUI Android app that records voice notes and automatically structures them using OpenAI's **Whisper** (speech-to-text) and **GPT-4** (note interpretation) APIs. Simply tap the microphone, speak, and the app transcribes your audio, interprets the content, and generates a structured note with title, description, and category — all in Portuguese (Brazil).
 
-Built with **MVVM architecture** using CommunityToolkit.Mvvm, SQLite for local storage, and dependency injection throughout.
+Built with **MVVM + layered architecture** across 7 projects using CommunityToolkit.Mvvm, SQLite for local storage, AutoMapper for Model↔DTO mapping, and dependency injection throughout.
 
 ---
 
@@ -19,6 +19,7 @@ Built with **MVVM architecture** using CommunityToolkit.Mvvm, SQLite for local s
 - 🎙️ **Voice Recording** — One-tap recording with automatic processing after stop
 - 🧠 **AI Transcription** — Speech-to-text via OpenAI Whisper API
 - 📝 **Smart Structuring** — GPT-4 interprets transcriptions and generates titled, categorized notes
+- 💬 **Comments & Consolidation** — Add comments to notes and consolidate them into a single coherent text via GPT-4
 - 🗂️ **Category Management** — Full CRUD for custom categories with 6 default seeds
 - 🔍 **Category Filtering** — Filter notes by category on the main list
 - ⚡ **Auto-Processing** — Records, transcribes, and structures in a single flow (no manual steps)
@@ -26,6 +27,7 @@ Built with **MVVM architecture** using CommunityToolkit.Mvvm, SQLite for local s
 - 🌙 **Dark Mode** — Full light/dark theme support with brand colors
 - 💾 **Offline Storage** — All notes persisted locally in SQLite
 - ✏️ **Edit & Delete** — Swipe-to-delete and full note editing with category reassignment
+- 📖 **Auto-Generated API Docs** — XML documentation deployed to GitHub Wiki
 
 ---
 
@@ -33,30 +35,75 @@ Built with **MVVM architecture** using CommunityToolkit.Mvvm, SQLite for local s
 
 ### Core Framework
 - **.NET MAUI 8** — Cross-platform UI framework (targeting Android)
-- **CommunityToolkit.Mvvm 8.3** — Source-generated MVVM with `[ObservableProperty]` and `[RelayCommand]`
+- **CommunityToolkit.Mvvm 8.3.2** — Source-generated MVVM with `[ObservableProperty]` and `[RelayCommand]`
 
 ### AI & Speech
 - **OpenAI Whisper API** — Audio transcription (speech-to-text)
-- **OpenAI GPT-4o** — Note interpretation and structuring
+- **OpenAI GPT-4o** — Note interpretation, structuring, and consolidation
 
 ### Database
-- **SQLite** (sqlite-net-pcl 1.9) — Local storage for notes, categories, and settings
-- **SQLitePCLRaw.bundle_green** — SQLite native bindings
+- **SQLite** (sqlite-net-pcl 1.9.172) — Local storage for notes, categories, comments, and settings
+- **SQLitePCLRaw.bundle_green 2.1.10** — SQLite native bindings
 
 ### Audio
 - **Plugin.Maui.Audio 3.0** — Cross-platform audio recording
 
+### Mapping
+- **AutoMapper 12.0.1** — Model↔DTO mapping between Domain entities and DTO classes
+
 ### Configuration
-- **Microsoft.Extensions.Configuration** — Embedded `appsettings.json` with runtime override via SQLite
+- **Microsoft.Extensions.Configuration 8.0** — Embedded `appsettings.json` with runtime override via SQLite
 
 ### Testing
-- **xUnit 2.6** — Test framework
-- **Moq 4.20** — Mocking library
+- **xUnit 2.6.6** — Test framework
+- **Moq 4.20.72** — Mocking library
 - **SQLite in-memory** — Temporary databases for repository tests
 
 ### CI/CD
-- **GitHub Actions** — Automated Android APK builds
+- **GitHub Actions** — 4 workflows: versioning, release, APK build, and API docs
 - **GitVersion 5.x** — Semantic versioning from git history
+
+---
+
+## 📐 Architecture
+
+The solution follows a **layered architecture** with clear separation of concerns across 7 projects:
+
+```
+┌─────────────────────────────────────────────────┐
+│              VoiceNotesAI (MAUI)                │
+│         Pages, ViewModels, Converters           │
+└────────────────────┬────────────────────────────┘
+                     │ uses DTOs via Service interfaces
+┌────────────────────▼────────────────────────────┐
+│           VoiceNotesAI.Application              │
+│    Service interfaces + implementations + DI    │
+└────────────────────┬────────────────────────────┘
+          ┌──────────┼──────────┐
+          ▼          ▼          ▼
+┌─────────────┐ ┌────────┐ ┌──────────────────────┐
+│   Domain    │ │  DTO   │ │   Infra.Interfaces   │
+│Models+Helpers│ │  Info  │ │  Repo + AppService   │
+│  +Services  │ │ classes│ │     interfaces        │
+└─────────────┘ └────────┘ └──────────┬───────────┘
+                                      │
+                           ┌──────────▼───────────┐
+                           │   VoiceNotesAI.Infra  │
+                           │ Repos, AppServices,   │
+                           │ Context, AutoMapper   │
+                           └───────────────────────┘
+```
+
+### Core Flow
+```
+Recording (AudioAppService) → Transcription (SpeechToTextAppService → Whisper API)
+→ Interpretation (AIAppService → GPT-4) → Storage (NoteService → NoteRepository → SQLite)
+```
+
+### Data Flow
+```
+ViewModels → Domain Services (DTOs) → Repositories (Domain Models) → SQLite
+```
 
 ---
 
@@ -66,55 +113,47 @@ Built with **MVVM architecture** using CommunityToolkit.Mvvm, SQLite for local s
 VoiceNotesAI/
 ├── .github/
 │   └── workflows/
-│       └── build-apk.yml           # CI pipeline: build + release APK
-├── VoiceNotesAI/                    # Main MAUI project
-│   ├── Converters/                  # IValueConverter implementations
-│   ├── Data/
-│   │   └── AppDatabase.cs          # SQLite connection + table init + seed
-│   ├── Helpers/
-│   │   ├── AppSettings.cs          # OpenAISettings POCO
-│   │   └── PromptTemplates.cs      # GPT-4 system prompt (Portuguese)
-│   ├── Models/
-│   │   ├── Note.cs                 # Voice note entity
-│   │   ├── NoteResult.cs           # AI response DTO
-│   │   ├── Category.cs             # Category entity
-│   │   └── AppSetting.cs           # Key-value settings entity
-│   ├── Pages/                       # XAML pages (UI layer)
-│   │   ├── NoteListPage.xaml        # Main list with category filter + FAB
-│   │   ├── RecordingPage.xaml       # Auto-start recording screen
-│   │   ├── NoteResultPage.xaml      # AI result review + save
-│   │   ├── NoteDetailPage.xaml      # Note edit/view
-│   │   ├── CategoryListPage.xaml    # Category CRUD list
-│   │   ├── CategoryDetailPage.xaml  # Category edit form
-│   │   └── SettingsPage.xaml        # API key + model config
-│   ├── Services/                    # Business logic (interface-based)
-│   │   ├── IAudioService.cs         # Audio recording contract
-│   │   ├── ISpeechToTextService.cs  # Whisper API contract
-│   │   ├── IAIService.cs            # GPT-4 API contract
-│   │   ├── INoteRepository.cs       # Note CRUD contract
-│   │   ├── ICategoryRepository.cs   # Category CRUD contract
-│   │   └── ISettingsRepository.cs   # Settings CRUD contract
-│   ├── ViewModels/                  # MVVM ViewModels
-│   │   ├── NoteListViewModel.cs     # Notes list + filter logic
-│   │   ├── RecordingViewModel.cs    # Recording + auto-process
-│   │   ├── NoteResultViewModel.cs   # AI result display
-│   │   ├── NoteDetailViewModel.cs   # Note editing
-│   │   ├── CategoryListViewModel.cs # Category management
-│   │   ├── CategoryDetailViewModel.cs
-│   │   └── SettingsViewModel.cs     # API settings management
-│   ├── Resources/                   # Images, icons, styles, splash
-│   ├── Platforms/Android/           # Android-specific config
-│   ├── App.xaml                     # Global styles + converters
-│   ├── AppShell.xaml                # Flyout navigation (hamburger menu)
-│   ├── MauiProgram.cs              # DI registration
+│       ├── version-tag.yml          # Semantic versioning + git tag
+│       ├── create-release.yml       # GitHub Release on minor/major bumps
+│       ├── build-apk.yml           # Build + publish Android APK
+│       └── generate-docs.yml       # XML docs → GitHub Wiki
+├── VoiceNotesAI/                    # MAUI app (net8.0-android)
+│   ├── Converters/                  # 6 IValueConverter implementations
+│   ├── Pages/                       # 7 XAML pages (UI layer)
+│   ├── ViewModels/                  # 7 ViewModels (CommunityToolkit.Mvvm)
+│   ├── Platforms/Android/           # MainActivity, MainApplication
+│   ├── Resources/                   # Icons, splash, images, styles
+│   ├── App.xaml(.cs)                # App entry + runtime settings load
+│   ├── AppShell.xaml(.cs)           # Flyout navigation (hamburger menu)
+│   ├── MauiProgram.cs              # DI bootstrap
 │   ├── appsettings.example.json     # Configuration template
 │   └── VoiceNotesAI.csproj
-├── VoiceNotesAI.Tests/              # Unit tests
+├── VoiceNotesAI.Domain/             # Domain layer (net8.0)
+│   ├── Models/                      # SQLite entities (Note, Category, Comment, AppSetting)
+│   ├── Helpers/                     # OpenAISettings, PromptTemplates
+│   └── Services/                    # Domain service interfaces + implementations
+├── VoiceNotesAI.DTO/                # Data Transfer Objects (net8.0)
+│   ├── NoteInfo.cs                  # Note DTO
+│   ├── CategoryInfo.cs              # Category DTO
+│   ├── CommentInfo.cs               # Comment DTO
+│   └── NoteResult.cs                # AI response DTO (title, description, category)
+├── VoiceNotesAI.Infra.Interfaces/   # Contracts (net8.0)
+│   ├── Repository/                  # INoteRepository, ICategoryRepository, etc.
+│   └── AppServices/                 # IAIAppService, IAudioAppService, ISpeechToTextAppService
+├── VoiceNotesAI.Infra/              # Infrastructure (net8.0)
+│   ├── Context/                     # AppDatabase (SQLite wrapper + seed)
+│   ├── Repository/                  # Repository implementations
+│   ├── AppServices/                 # AI, Audio, SpeechToText implementations
+│   └── Mapping/                     # AutoMapper profiles (Note, Category, Comment)
+├── VoiceNotesAI.Application/        # Application layer (net8.0)
+│   └── Startup.cs                   # AddApplicationServices() — DI registration
+├── VoiceNotesAI.Tests/              # Unit tests (net8.0)
 │   ├── Services/                    # Repository + API service tests
-│   ├── Models/                      # Model tests
+│   ├── Models/                      # Domain entity tests
+│   ├── Mappers/                     # AutoMapper profile tests
 │   └── Helpers/                     # Prompt template tests
 ├── GitVersion.yml                   # Semantic versioning config
-├── global.json                      # .NET SDK version pinning
+├── global.json                      # .NET SDK version pinning (8.0.100)
 ├── VoiceNotesAI.sln
 └── README.md
 ```
@@ -181,10 +220,10 @@ cp VoiceNotesAI/appsettings.example.json VoiceNotesAI/appsettings.json
 # Edit appsettings.json with your OpenAI API key
 ```
 
-#### 4. Build
+#### 4. Build the solution
 
 ```bash
-dotnet build VoiceNotesAI/VoiceNotesAI.csproj -f net8.0-android
+dotnet build VoiceNotesAI.sln
 ```
 
 #### 5. Deploy to emulator/device
@@ -225,10 +264,17 @@ VoiceNotesAI.Tests/
 │   ├── SpeechToTextServiceTests.cs    # Whisper API mocked HTTP tests
 │   ├── NoteRepositoryTests.cs         # SQLite CRUD tests
 │   ├── CategoryRepositoryTests.cs     # Category CRUD tests
+│   ├── CommentRepositoryTests.cs      # Comment CRUD tests
 │   └── SettingsRepositoryTests.cs     # Key-value settings tests
 ├── Models/
 │   ├── NoteTests.cs                   # Note entity tests
-│   └── NoteResultTests.cs            # AI response DTO tests
+│   ├── NoteResultTests.cs            # AI response DTO tests
+│   ├── CategoryTests.cs              # Category entity tests
+│   └── CommentTests.cs               # Comment entity tests
+├── Mappers/
+│   ├── NoteProfileTests.cs           # Note AutoMapper profile tests
+│   ├── CategoryProfileTests.cs       # Category AutoMapper profile tests
+│   └── CommentProfileTests.cs        # Comment AutoMapper profile tests
 └── Helpers/
     └── PromptTemplatesTests.cs        # Prompt generation tests
 ```
@@ -237,7 +283,8 @@ VoiceNotesAI.Tests/
 
 - **Service tests** mock `HttpMessageHandler` to simulate OpenAI API responses
 - **Repository tests** use temporary SQLite databases with `IAsyncLifetime` for setup/teardown
-- Source files are linked (not referenced) from the main project to avoid MAUI TFM incompatibility
+- **Mapper tests** verify AutoMapper profile configurations for all entities
+- **Model tests** validate domain entity behavior (Create, Validate, Update methods)
 
 ---
 
@@ -245,22 +292,34 @@ VoiceNotesAI.Tests/
 
 ### GitHub Actions
 
-**Workflow:** `.github/workflows/build-apk.yml`
+The project uses 4 chained workflows for automated versioning, releases, and builds:
 
-**Triggers:**
-- `workflow_dispatch` (manual)
-- After `Create Release` workflow completes
+| Workflow | File | Trigger | Purpose |
+|----------|------|---------|---------|
+| **Version and Tag** | `version-tag.yml` | Push to `main` | Determines semantic version via GitVersion and creates a git tag |
+| **Create Release** | `create-release.yml` | After Version and Tag | Creates a GitHub Release on minor/major version bumps |
+| **Build Android APK** | `build-apk.yml` | After Create Release | Builds, publishes, and attaches APK to the release |
+| **Generate API Docs** | `generate-docs.yml` | Push to `main` (Domain/Infra paths) | Generates XML docs and deploys to GitHub Wiki |
 
-**Pipeline steps:**
-1. Checkout code
-2. Setup .NET 8 SDK (pinned via `global.json`)
-3. Install `maui-android` workload
-4. Determine version with GitVersion
-5. Restore, build, and publish Android APK
-6. Upload APK as artifact (90-day retention)
-7. Attach APK to GitHub Release (if available)
+**Pipeline flow:**
+```
+Push to main → Version and Tag → Create Release → Build Android APK
+                                                        ↓
+                                            Upload APK artifact (90 days)
+                                            Attach APK to GitHub Release
+```
 
-**Versioning:** Semantic versioning via [GitVersion](https://gitversion.net/) with branch-based policies (main = patch, develop = minor, feature = minor + alpha tag).
+**Versioning:** Semantic versioning via [GitVersion](https://gitversion.net/) with branch-based policies:
+
+| Branch | Increment | Tag |
+|--------|-----------|-----|
+| `main` | Patch | (release) |
+| `develop` | Minor | alpha |
+| `feature/*` | Minor | alpha |
+| `release/*` | Patch | beta |
+| `hotfix/*` | Patch | (none) |
+
+**Commit prefixes:** `feat:`/`feature:` → minor, `fix:`/`patch:` → patch, `major:`/`breaking:` → major.
 
 ---
 
@@ -272,7 +331,7 @@ VoiceNotesAI.Tests/
 
 **Cause:** .NET 10+ SDK treats net8.0 as EOL.
 
-**Solution:** Ensure `global.json` pins the SDK and add `<CheckEolTargetFramework>false</CheckEolTargetFramework>` to the `.csproj`:
+**Solution:** Ensure `global.json` pins the SDK and `<CheckEolTargetFramework>false</CheckEolTargetFramework>` is set in the `.csproj`:
 ```json
 {
   "sdk": {
@@ -339,6 +398,7 @@ This project is licensed under the **MIT License** — see the [LICENSE](LICENSE
 - Built with [.NET MAUI](https://dotnet.microsoft.com/apps/maui)
 - AI powered by [OpenAI](https://openai.com/) (Whisper + GPT-4)
 - MVVM toolkit by [CommunityToolkit.Mvvm](https://github.com/CommunityToolkit/dotnet)
+- Object mapping by [AutoMapper](https://automapper.org/)
 - Audio recording by [Plugin.Maui.Audio](https://github.com/jfversluis/Plugin.Maui.Audio)
 - Local storage by [sqlite-net](https://github.com/praeclarum/sqlite-net)
 
@@ -347,6 +407,7 @@ This project is licensed under the **MIT License** — see the [LICENSE](LICENSE
 ## 📞 Support
 
 - **Issues**: [GitHub Issues](https://github.com/landim32/VoiceNotesAI/issues)
+- **Wiki**: [API Documentation](https://github.com/landim32/VoiceNotesAI/wiki)
 
 ---
 
