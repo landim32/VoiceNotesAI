@@ -2,7 +2,7 @@ using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Plugin.Maui.Audio;
-using VoiceNotesAI.Data;
+using VoiceNotesAI.Context;
 using VoiceNotesAI.Helpers;
 using VoiceNotesAI.Services;
 using VoiceNotesAI.Pages;

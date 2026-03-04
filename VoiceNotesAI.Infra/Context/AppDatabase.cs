@@ -1,7 +1,7 @@
 using SQLite;
 using VoiceNotesAI.Models;
 
-namespace VoiceNotesAI.Data;
+namespace VoiceNotesAI.Context;
 
 public class AppDatabase
 {

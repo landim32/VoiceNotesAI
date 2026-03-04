@@ -1,4 +1,4 @@
-using VoiceNotesAI.Data;
+using VoiceNotesAI.Context;
 using VoiceNotesAI.Models;
 
 namespace VoiceNotesAI.Services;

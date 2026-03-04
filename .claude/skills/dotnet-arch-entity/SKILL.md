@@ -1,329 +1,468 @@
 ---
 name: dotnet-arch-entity
-description: Guides the implementation of a new entity following the MVVM pattern of this project. Covers all layers from Model to Page, including SQLite table, Repository pattern, ViewModel, Page, and DI registration. Use when creating or modifying entities, adding new tables, or scaffolding CRUD features.
+description: Guides the implementation of a new entity following the Clean Architecture pattern of this project. Covers all layers from DTO to Database, including EF Core Code First, AutoMapper profiles, Repository pattern, Domain services, and DI registration. Use when creating or modifying entities, adding new tables, or scaffolding CRUD features.
 allowed-tools: Read, Grep, Glob, Bash, Write, Edit, Task
 ---
 
-# .NET MAUI MVVM — Entity Implementation Guide
+# .NET Clean Architecture — Entity Implementation Guide
 
-You are an expert assistant that helps developers create or modify entities following the exact architecture patterns of this VoiceNotesAI project. You guide the user through ALL required layers.
+You are an expert assistant that helps developers create or modify entities following the exact architecture patterns of this NNews project. You guide the user through ALL required layers.
 
 ## Input
 
 The user will describe the entity to create or modify: `$ARGUMENTS`
 
-Before generating code, read existing files (use Note/Category as primary reference) to match current patterns exactly.
+Before generating code, read existing files (use Category as primary reference) to match current patterns exactly.
 
 ---
 
 ## Architecture & Data Flow
 
 ```
-Page (XAML) → ViewModel (MVVM Toolkit) → Service/Repository → AppDatabase → SQLite
+Controller → Service → Repository → DbContext → PostgreSQL
 ```
 
-**Project:** Single .NET MAUI project (`VoiceNotesAI`) with test project (`VoiceNotesAI.Tests`)
+**Mapping chain:** EF Entity ↔ Domain Model ↔ DTO (two AutoMapper profiles per entity)
 
-**Key Directories:**
-- `VoiceNotesAI/Models/` — SQLite entities and DTOs
-- `VoiceNotesAI/Services/` — Interfaces and implementations (repository, API services)
-- `VoiceNotesAI/ViewModels/` — MVVM ViewModels with CommunityToolkit.Mvvm
-- `VoiceNotesAI/Pages/` — XAML pages with code-behind
-- `VoiceNotesAI/Data/` — AppDatabase (SQLite wrapper)
+**Projects:**
+- `NNews.DTO` — Public API contracts (DTOs)
+- `NNews.Domain` — Entity interfaces, models, enums, services
+- `NNews.Infra.Interfaces` — Repository contracts
+- `NNews.Infra` — EF Core entities, DbContext, repositories, AutoMapper profiles
+- `NNews.Application` — DI registration (Initializer.cs)
+- `NNews.API` — Controllers
 
 ---
 
 ## Step-by-Step Implementation
 
-### Step 1: Model — `VoiceNotesAI/Models/{Entity}.cs`
+### Step 1: DTO — `NNews.DTO/{Entity}Info.cs`
 
 ```csharp
-using SQLite;
-
-namespace VoiceNotesAI.Models;
-
-public class {Entity}
+namespace NNews.DTO
 {
-    [PrimaryKey, AutoIncrement]
-    public int Id { get; set; }
-    public string Name { get; set; } = string.Empty;
-    // Add entity-specific properties
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+    public class {Entity}Info
+    {
+        public long {Entity}Id { get; set; }
+        public string Title { get; set; }
+        // Nullable types for optional fields (DateTime?, long?)
+        public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
+    }
 }
 ```
 
-Conventions:
-- File-scoped namespace
-- `[PrimaryKey, AutoIncrement]` on `Id`
-- Default values via `= string.Empty` or `= DateTime.UtcNow`
-- No navigation properties (SQLite-net doesn't support them)
+Create `{Entity}InsertedInfo` (no Id) and `{Entity}UpdatedInfo` (with Id) if insert/update shapes differ.
 
-### Step 2: Database Table — Modify `VoiceNotesAI/Data/AppDatabase.cs`
-
-Add table creation in `InitializeAsync()`:
+### Step 2: Domain Interface — `NNews.Domain/Entities/Interfaces/I{Entity}Model.cs`
 
 ```csharp
-await _database.CreateTableAsync<{Entity}>();
-```
-
-Add seed data method if needed (see `SeedCategoriesAsync()` as reference).
-
-### Step 3: Repository Interface — `VoiceNotesAI/Services/I{Entity}Repository.cs`
-
-```csharp
-using VoiceNotesAI.Models;
-
-namespace VoiceNotesAI.Services;
-
-public interface I{Entity}Repository
+namespace NNews.Domain.Entities.Interfaces
 {
-    Task<List<{Entity}>> GetAllAsync();
-    Task<{Entity}?> GetByIdAsync(int id);
-    Task<int> SaveAsync({Entity} entity);
-    Task<int> DeleteAsync(int id);
+    public interface I{Entity}Model
+    {
+        long {Entity}Id { get; }
+        string Title { get; }
+        DateTime CreatedAt { get; }
+        DateTime UpdatedAt { get; }
+        // Read-only properties only. Mutations via methods:
+        void Update(string title);
+    }
 }
 ```
 
-Convention: Async methods, nullable return for `GetByIdAsync`.
+### Step 3: Domain Model — `NNews.Domain/Entities/{Entity}Model.cs`
 
-### Step 4: Repository Implementation — `VoiceNotesAI/Services/{Entity}Repository.cs`
+Key patterns (see `CategoryModel.cs` as reference):
+- **Private setters** on all properties
+- **Private parameterless constructor** (for mapper)
+- **Factory methods:** `Create(...)` for new, `Reconstruct(...)` from persistence
+- **Validation** in private `Set{Prop}` methods
+- **`UpdateTimestamp()`** called on every mutation
+- **`Equals`/`GetHashCode`** by Id
 
 ```csharp
-using VoiceNotesAI.Data;
-using VoiceNotesAI.Models;
+using NNews.Domain.Entities.Interfaces;
 
-namespace VoiceNotesAI.Services;
-
-public class {Entity}Repository : I{Entity}Repository
+namespace NNews.Domain.Entities
 {
-    private readonly AppDatabase _database;
-
-    public {Entity}Repository(AppDatabase database)
+    public class {Entity}Model : I{Entity}Model
     {
-        _database = database;
-    }
+        public long {Entity}Id { get; private set; }
+        public string Title { get; private set; }
+        public DateTime CreatedAt { get; private set; }
+        public DateTime UpdatedAt { get; private set; }
 
-    public async Task<List<{Entity}>> GetAllAsync()
-    {
-        return await _database.Connection
-            .Table<{Entity}>()
-            .OrderByDescending(e => e.CreatedAt)
-            .ToListAsync();
-    }
+        private {Entity}Model() { Title = string.Empty; }
 
-    public async Task<{Entity}?> GetByIdAsync(int id)
-    {
-        return await _database.Connection
-            .Table<{Entity}>()
-            .FirstOrDefaultAsync(e => e.Id == id);
-    }
-
-    public async Task<int> SaveAsync({Entity} entity)
-    {
-        if (entity.Id != 0)
+        public {Entity}Model(string title) : this()
         {
-            entity.UpdatedAt = DateTime.UtcNow;
-            return await _database.Connection.UpdateAsync(entity);
+            SetTitle(title);
+            CreatedAt = DateTime.UtcNow;
+            UpdatedAt = DateTime.UtcNow;
         }
-        else
+
+        public static {Entity}Model Create(string title) => new(title);
+
+        public static {Entity}Model Reconstruct(long id, string title, DateTime createdAt, DateTime updatedAt)
+            => new() { {Entity}Id = id, Title = title, CreatedAt = createdAt, UpdatedAt = updatedAt };
+
+        public void Update(string title) { SetTitle(title); UpdatedAt = DateTime.UtcNow; }
+
+        private void SetTitle(string title)
         {
-            entity.CreatedAt = DateTime.UtcNow;
-            entity.UpdatedAt = DateTime.UtcNow;
-            return await _database.Connection.InsertAsync(entity);
+            if (string.IsNullOrWhiteSpace(title))
+                throw new ArgumentException("Title cannot be null or empty.", nameof(title));
+            Title = title.Trim();
+        }
+
+        public override bool Equals(object? obj) =>
+            obj is {Entity}Model other && {Entity}Id != 0 && other.{Entity}Id != 0 && {Entity}Id == other.{Entity}Id;
+        public override int GetHashCode() => {Entity}Id.GetHashCode();
+    }
+}
+```
+
+### Step 4: EF Entity — `NNews.Infra/Context/{Entity}.cs`
+
+```csharp
+namespace NNews.Infra.Context;
+
+public partial class {Entity}
+{
+    public long {Entity}Id { get; set; }
+    public string Title { get; set; } = null!;
+    public DateTime CreatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; }
+    // Navigation properties: virtual, collections as new List<>()
+    public virtual ICollection<Article> Articles { get; set; } = new List<Article>();
+}
+```
+
+Convention: `partial class`, public setters, `virtual` navigation properties.
+
+### Step 5: DbContext — Modify `NNews.Infra/Context/NNewsContext.cs`
+
+Add DbSet and configure in `OnModelCreating`:
+
+```csharp
+// Add DbSet
+public virtual DbSet<{Entity}> {Entity}s { get; set; }
+
+// Inside OnModelCreating:
+modelBuilder.Entity<{Entity}>(entity =>
+{
+    entity.HasKey(e => e.{Entity}Id).HasName("{entities}_pkey");
+    entity.ToTable("{entities}");  // snake_case plural
+
+    entity.Property(e => e.{Entity}Id)
+        .HasDefaultValueSql("nextval('{entity}_id_seq'::regclass)")
+        .HasColumnName("{entity}_id");
+    entity.Property(e => e.CreatedAt)
+        .HasColumnType("timestamp without time zone")
+        .HasColumnName("created_at");
+    entity.Property(e => e.UpdatedAt)
+        .HasColumnType("timestamp without time zone")
+        .HasColumnName("updated_at");
+    entity.Property(e => e.Title)
+        .HasMaxLength(240)
+        .HasColumnName("title");
+});
+```
+
+Convention: snake_case table/columns, PostgreSQL sequences, `timestamp without time zone`, `DeleteBehavior.ClientSetNull` for FKs.
+
+### Step 6: Migration
+
+```bash
+dotnet ef migrations add Add{Entity}Table --project NNews.Infra --startup-project NNews.API
+dotnet ef database update --project NNews.Infra --startup-project NNews.API
+```
+
+### Step 7: Repository Interface — `NNews.Infra.Interfaces/Repository/I{Entity}Repository.cs`
+
+```csharp
+namespace NNews.Infra.Interfaces.Repository
+{
+    public interface I{Entity}Repository<TModel>
+    {
+        IEnumerable<TModel> ListAll();
+        TModel GetById(int id);
+        TModel Insert(TModel entity);
+        TModel Update(TModel entity);
+        void Delete(int id);
+    }
+}
+```
+
+Convention: Generic `<TModel>`. For pagination: `(IEnumerable<TModel> Items, int TotalCount)` tuples.
+
+### Step 8: Repository Implementation — `NNews.Infra/Repository/{Entity}Repository.cs`
+
+Key patterns (see `CategoryRepository.cs`):
+- Inject `NNewsContext` + `IMapper`
+- **Reads:** `AsNoTracking()`, map EF → Domain via `_mapper.Map<{Entity}Model>(...)`
+- **Insert:** `DateTime.SpecifyKind(DateTime.UtcNow, DateTimeKind.Unspecified)` for timestamps
+- **Update:** Fetch tracked entity, mutate properties, `SaveChanges()`
+- **Delete:** Fetch, remove, `SaveChanges()`, throw `KeyNotFoundException` if not found
+
+```csharp
+using AutoMapper;
+using NNews.Domain.Entities;
+using NNews.Domain.Entities.Interfaces;
+using NNews.Infra.Context;
+using NNews.Infra.Interfaces.Repository;
+
+namespace NNews.Infra.Repository
+{
+    public class {Entity}Repository : I{Entity}Repository<I{Entity}Model>
+    {
+        private readonly NNewsContext _context;
+        private readonly IMapper _mapper;
+
+        public {Entity}Repository(NNewsContext context, IMapper mapper)
+        {
+            _context = context ?? throw new ArgumentNullException(nameof(context));
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+        }
+
+        public IEnumerable<I{Entity}Model> ListAll()
+        {
+            var entities = _context.{Entity}s.AsNoTracking().OrderBy(e => e.Title).ToList();
+            return _mapper.Map<IEnumerable<{Entity}Model>>(entities);
+        }
+
+        public I{Entity}Model GetById(int id)
+        {
+            var entity = _context.{Entity}s.AsNoTracking()
+                .FirstOrDefault(e => e.{Entity}Id == id)
+                ?? throw new KeyNotFoundException($"{Entity} with ID {id} not found.");
+            return _mapper.Map<{Entity}Model>(entity);
+        }
+
+        public I{Entity}Model Insert(I{Entity}Model model)
+        {
+            var entity = _mapper.Map<{Entity}>(model);
+            entity.CreatedAt = DateTime.SpecifyKind(DateTime.UtcNow, DateTimeKind.Unspecified);
+            entity.UpdatedAt = DateTime.SpecifyKind(DateTime.UtcNow, DateTimeKind.Unspecified);
+            _context.{Entity}s.Add(entity);
+            _context.SaveChanges();
+            return _mapper.Map<{Entity}Model>(entity);
+        }
+
+        public I{Entity}Model Update(I{Entity}Model model)
+        {
+            var existing = _context.{Entity}s.FirstOrDefault(e => e.{Entity}Id == model.{Entity}Id)
+                ?? throw new KeyNotFoundException($"{Entity} with ID {model.{Entity}Id} not found.");
+            existing.Title = model.Title;
+            existing.UpdatedAt = DateTime.SpecifyKind(DateTime.UtcNow, DateTimeKind.Unspecified);
+            _context.SaveChanges();
+            return _mapper.Map<{Entity}Model>(existing);
+        }
+
+        public void Delete(int id)
+        {
+            var entity = _context.{Entity}s.FirstOrDefault(e => e.{Entity}Id == id)
+                ?? throw new KeyNotFoundException($"{Entity} with ID {id} not found.");
+            _context.{Entity}s.Remove(entity);
+            _context.SaveChanges();
         }
     }
-
-    public async Task<int> DeleteAsync(int id)
-    {
-        return await _database.Connection.DeleteAsync<{Entity}>(id);
-    }
 }
 ```
 
-Convention: Insert vs Update decided by `Id != 0`. Uses `_database.Connection` (SQLiteAsyncConnection).
+### Step 9: AutoMapper Profiles — `NNews.Infra/Mapping/Profiles/`
 
-### Step 5: ViewModel — `VoiceNotesAI/ViewModels/{Entity}ListViewModel.cs`
+**Two profiles per entity:**
 
+**`{Entity}Profile.cs`** (EF Entity ↔ Domain Model):
 ```csharp
-using System.Collections.ObjectModel;
-using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-using VoiceNotesAI.Models;
-using VoiceNotesAI.Services;
+using AutoMapper;
+using NNews.Domain.Entities;
+using NNews.Infra.Context;
 
-namespace VoiceNotesAI.ViewModels;
-
-public partial class {Entity}ListViewModel : ObservableObject
+namespace NNews.Infra.Mapping.Profiles
 {
-    private readonly I{Entity}Repository _{entity}Repository;
-
-    public {Entity}ListViewModel(I{Entity}Repository {entity}Repository)
+    public class {Entity}Profile : Profile
     {
-        _{entity}Repository = {entity}Repository;
-    }
+        public {Entity}Profile()
+        {
+            CreateMap<{Entity}, {Entity}Model>()
+                .ConstructUsing(src => {Entity}Model.Reconstruct(
+                    src.{Entity}Id, src.Title, src.CreatedAt, src.UpdatedAt));
 
-    [ObservableProperty]
-    private ObservableCollection<{Entity}> _items = [];
-
-    [ObservableProperty]
-    private bool _isLoading;
-
-    [ObservableProperty]
-    private bool _isEmpty;
-
-    [RelayCommand]
-    private async Task LoadItemsAsync()
-    {
-        IsLoading = true;
-        var items = await _{entity}Repository.GetAllAsync();
-        Items = new ObservableCollection<{Entity}>(items);
-        IsEmpty = Items.Count == 0;
-        IsLoading = false;
-    }
-
-    [RelayCommand]
-    private async Task DeleteAsync({Entity} item)
-    {
-        await _{entity}Repository.DeleteAsync(item.Id);
-        Items.Remove(item);
-        IsEmpty = Items.Count == 0;
+            CreateMap<{Entity}Model, {Entity}>()
+                .ForMember(dest => dest.Articles, opt => opt.Ignore()); // Ignore navigation props
+        }
     }
 }
 ```
 
-For detail/edit ViewModel, implement `IQueryAttributable`:
-
+**`{Entity}DtoProfile.cs`** (Domain Model ↔ DTO):
 ```csharp
-public partial class {Entity}DetailViewModel : ObservableObject, IQueryAttributable
+using AutoMapper;
+using NNews.Domain.Entities;
+using NNews.Domain.Entities.Interfaces;
+using NNews.DTO;
+
+namespace NNews.Infra.Mapping.Profiles
 {
-    public void ApplyQueryAttributes(IDictionary<string, object> query)
+    public class {Entity}DtoProfile : Profile
     {
-        // Receive navigation parameters
+        public {Entity}DtoProfile()
+        {
+            CreateMap<{Entity}Model, {Entity}Info>();
+            CreateMap<I{Entity}Model, {Entity}Info>();
+
+            CreateMap<{Entity}Info, {Entity}Model>()
+                .ConstructUsing(src => src.{Entity}Id > 0
+                    ? {Entity}Model.Reconstruct(src.{Entity}Id, src.Title, src.CreatedAt, src.UpdatedAt)
+                    : {Entity}Model.Create(src.Title));
+        }
     }
 }
 ```
 
-Conventions:
-- `[ObservableProperty]` with `_camelCase` private fields
-- `[RelayCommand]` with `Async` suffix on async methods
-- `ObservableCollection<T>` for lists
-- Shell navigation via `Shell.Current.GoToAsync()`
+Convention: `ConstructUsing` with factory methods. `Ignore()` navigation props. Map both concrete and interface.
 
-### Step 6: Page — `VoiceNotesAI/Pages/{Entity}ListPage.xaml` + `.cs`
+### Step 10: Service Interface — `NNews.Domain/Services/Interfaces/I{Entity}Service.cs`
 
-**Code-behind:**
 ```csharp
-using VoiceNotesAI.ViewModels;
+using NNews.DTO;
 
-namespace VoiceNotesAI.Pages;
-
-public partial class {Entity}ListPage : ContentPage
+namespace NNews.Domain.Services.Interfaces
 {
-    private readonly {Entity}ListViewModel _viewModel;
-
-    public {Entity}ListPage({Entity}ListViewModel viewModel)
+    public interface I{Entity}Service
     {
-        InitializeComponent();
-        _viewModel = viewModel;
-        BindingContext = viewModel;
-    }
-
-    protected override async void OnAppearing()
-    {
-        base.OnAppearing();
-        await _viewModel.LoadItemsCommand.ExecuteAsync(null);
+        IList<{Entity}Info> ListAll();
+        {Entity}Info GetById(int id);
+        {Entity}Info Insert({Entity}Info entity);
+        {Entity}Info Update({Entity}Info entity);
+        void Delete(int id);
     }
 }
 ```
 
-Convention: ViewModel injected via constructor, assigned to `BindingContext`. Load data in `OnAppearing`.
+Convention: Services receive/return **DTOs**, not domain models.
 
-### Step 7: Shell Navigation — Modify `VoiceNotesAI/AppShell.xaml`
+### Step 11: Service Implementation — `NNews.Domain/Services/{Entity}Service.cs`
 
-Add route registration:
-
-```csharp
-Routing.RegisterRoute(nameof({Entity}ListPage), typeof({Entity}ListPage));
-Routing.RegisterRoute(nameof({Entity}DetailPage), typeof({Entity}DetailPage));
-```
-
-### Step 8: DI Registration — Modify `VoiceNotesAI/MauiProgram.cs`
+Key patterns (see `CategoryService.cs`):
+- Inject repository (`I{Entity}Repository<I{Entity}Model>`) + `IMapper`
+- Map: DTO → Domain Model → Repository → Domain Model → DTO
+- Validation in service, not repository
+- Throw `ArgumentException` for invalid input, `InvalidOperationException` for business rules
 
 ```csharp
-// Services (Singleton)
-builder.Services.AddSingleton<I{Entity}Repository, {Entity}Repository>();
+using AutoMapper;
+using NNews.Domain.Entities;
+using NNews.Domain.Entities.Interfaces;
+using NNews.Domain.Services.Interfaces;
+using NNews.DTO;
+using NNews.Infra.Interfaces.Repository;
 
-// ViewModels (Transient)
-builder.Services.AddTransient<{Entity}ListViewModel>();
-builder.Services.AddTransient<{Entity}DetailViewModel>();
-
-// Pages (Transient)
-builder.Services.AddTransient<{Entity}ListPage>();
-builder.Services.AddTransient<{Entity}DetailPage>();
-```
-
-Convention: Services as **Singleton**, ViewModels and Pages as **Transient**.
-
-### Step 9: Tests — `VoiceNotesAI.Tests/Services/{Entity}RepositoryTests.cs`
-
-```csharp
-using VoiceNotesAI.Data;
-using VoiceNotesAI.Models;
-using VoiceNotesAI.Services;
-
-namespace VoiceNotesAI.Tests.Services;
-
-public class {Entity}RepositoryTests : IAsyncLifetime
+namespace NNews.Domain.Services
 {
-    private AppDatabase _database = null!;
-    private {Entity}Repository _repository = null!;
-    private string _dbPath = null!;
-
-    public async Task InitializeAsync()
+    public class {Entity}Service : I{Entity}Service
     {
-        _dbPath = Path.Combine(Path.GetTempPath(), $"test_{Guid.NewGuid()}.db3");
-        _database = new AppDatabase(_dbPath);
-        await _database.InitializeAsync();
-        _repository = new {Entity}Repository(_database);
-    }
+        private readonly I{Entity}Repository<I{Entity}Model> _repository;
+        private readonly IMapper _mapper;
 
-    public Task DisposeAsync()
-    {
-        if (File.Exists(_dbPath)) File.Delete(_dbPath);
-        return Task.CompletedTask;
-    }
+        public {Entity}Service(I{Entity}Repository<I{Entity}Model> repository, IMapper mapper)
+        {
+            _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+        }
 
-    [Fact]
-    public async Task SaveAsync_NewEntity_ReturnsPositiveId()
-    {
-        var entity = new {Entity} { Name = "Test" };
-        var result = await _repository.SaveAsync(entity);
-        Assert.True(result > 0);
-    }
+        public IList<{Entity}Info> ListAll() => _mapper.Map<IList<{Entity}Info>>(_repository.ListAll());
+        public {Entity}Info GetById(int id) => _mapper.Map<{Entity}Info>(_repository.GetById(id));
 
-    [Fact]
-    public async Task GetAllAsync_ReturnsAllEntities()
-    {
-        await _repository.SaveAsync(new {Entity} { Name = "Item 1" });
-        await _repository.SaveAsync(new {Entity} { Name = "Item 2" });
-        var items = await _repository.GetAllAsync();
-        Assert.Equal(2, items.Count);
-    }
+        public {Entity}Info Insert({Entity}Info dto)
+        {
+            if (dto == null) throw new ArgumentNullException(nameof(dto));
+            // Add validation here
+            var model = _mapper.Map<{Entity}Model>(dto);
+            return _mapper.Map<{Entity}Info>(_repository.Insert(model));
+        }
 
-    [Fact]
-    public async Task DeleteAsync_RemovesEntity()
-    {
-        var entity = new {Entity} { Name = "To Delete" };
-        await _repository.SaveAsync(entity);
-        await _repository.DeleteAsync(entity.Id);
-        var result = await _repository.GetByIdAsync(entity.Id);
-        Assert.Null(result);
+        public {Entity}Info Update({Entity}Info dto)
+        {
+            if (dto == null) throw new ArgumentNullException(nameof(dto));
+            // Add validation here
+            var model = _mapper.Map<{Entity}Model>(dto);
+            return _mapper.Map<{Entity}Info>(_repository.Update(model));
+        }
+
+        public void Delete(int id) => _repository.Delete(id);
     }
 }
 ```
 
-Convention: `IAsyncLifetime` for setup/teardown, temp SQLite DB, test naming `Method_Scenario_Expected`.
+### Step 12: DI Registration — Modify `NNews.Application/Initializer.cs`
+
+Add three entries:
+
+```csharp
+// Repository region:
+injectDependency(typeof(I{Entity}Repository<I{Entity}Model>), typeof({Entity}Repository), services, scoped);
+
+// AutoMapper region:
+services.AddAutoMapper(cfg => { }, typeof({Entity}Profile).Assembly);
+services.AddAutoMapper(cfg => { }, typeof({Entity}DtoProfile).Assembly);
+
+// Service region:
+injectDependency(typeof(I{Entity}Service), typeof({Entity}Service), services, scoped);
+```
+
+### Step 13: Controller — `NNews.API/Controllers/{Entity}Controller.cs`
+
+Key patterns (see `CategoryController.cs`):
+- Inject `I{Entity}Service`, `IUserClient`, `ILogger`
+- `[Authorize]` on write endpoints, `IUserClient.GetUserInSession()` for auth check
+- Error handling: `KeyNotFoundException` → 404, `ArgumentException` → 400, generic → 500
+- `CreatedAtAction` for POST responses
+
+```csharp
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using NAuth.ACL.Interfaces;
+using NNews.Domain.Services.Interfaces;
+using NNews.DTO;
+
+namespace NNews.API.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class {Entity}Controller : ControllerBase
+    {
+        private readonly I{Entity}Service _service;
+        private readonly IUserClient _userClient;
+        private readonly ILogger<{Entity}Controller> _logger;
+
+        public {Entity}Controller(I{Entity}Service service, IUserClient userClient, ILogger<{Entity}Controller> logger)
+        {
+            _service = service ?? throw new ArgumentNullException(nameof(service));
+            _userClient = userClient ?? throw new ArgumentNullException(nameof(userClient));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        }
+
+        [HttpGet] [Authorize]
+        public IActionResult GetAll() { /* auth + _service.ListAll() */ }
+
+        [HttpGet("{id}")]
+        public IActionResult GetById(int id) { /* _service.GetById(id), 404 on KeyNotFound */ }
+
+        [HttpPost] [Authorize]
+        public IActionResult Insert([FromBody] {Entity}Info dto) { /* auth + validate + CreatedAtAction */ }
+
+        [HttpPut] [Authorize]
+        public IActionResult Update([FromBody] {Entity}Info dto) { /* auth + validate + Ok */ }
+
+        [HttpDelete("{id}")] [Authorize]
+        public IActionResult Delete(int id) { /* auth + NoContent, 404 on KeyNotFound */ }
+    }
+}
+```
 
 ---
 
@@ -331,23 +470,26 @@ Convention: `IAsyncLifetime` for setup/teardown, temp SQLite DB, test naming `Me
 
 | # | Layer | Action | File |
 |---|-------|--------|------|
-| 1 | Model | Create | `VoiceNotesAI/Models/{Entity}.cs` |
-| 2 | Data | Modify | `VoiceNotesAI/Data/AppDatabase.cs` (add CreateTableAsync) |
-| 3 | Service | Create | `VoiceNotesAI/Services/I{Entity}Repository.cs` |
-| 4 | Service | Create | `VoiceNotesAI/Services/{Entity}Repository.cs` |
-| 5 | ViewModel | Create | `VoiceNotesAI/ViewModels/{Entity}ListViewModel.cs` |
-| 6 | ViewModel | Create | `VoiceNotesAI/ViewModels/{Entity}DetailViewModel.cs` (if needed) |
-| 7 | Page | Create | `VoiceNotesAI/Pages/{Entity}ListPage.xaml` + `.cs` |
-| 8 | Page | Create | `VoiceNotesAI/Pages/{Entity}DetailPage.xaml` + `.cs` (if needed) |
-| 9 | Navigation | Modify | `VoiceNotesAI/AppShell.xaml` (register routes) |
-| 10 | DI | Modify | `VoiceNotesAI/MauiProgram.cs` (register services, VMs, pages) |
-| 11 | Tests | Create | `VoiceNotesAI.Tests/Services/{Entity}RepositoryTests.cs` |
+| 1 | DTO | Create | `NNews.DTO/{Entity}Info.cs` |
+| 2 | Domain | Create | `NNews.Domain/Entities/Interfaces/I{Entity}Model.cs` |
+| 3 | Domain | Create | `NNews.Domain/Entities/{Entity}Model.cs` |
+| 4 | Infra | Create | `NNews.Infra/Context/{Entity}.cs` |
+| 5 | Infra | Modify | `NNews.Infra/Context/NNewsContext.cs` |
+| 6 | Infra | Run | `dotnet ef migrations add Add{Entity}Table` |
+| 7 | Infra.Interfaces | Create | `NNews.Infra.Interfaces/Repository/I{Entity}Repository.cs` |
+| 8 | Infra | Create | `NNews.Infra/Repository/{Entity}Repository.cs` |
+| 9 | Infra | Create | `NNews.Infra/Mapping/Profiles/{Entity}Profile.cs` |
+| 10 | Infra | Create | `NNews.Infra/Mapping/Profiles/{Entity}DtoProfile.cs` |
+| 11 | Domain | Create | `NNews.Domain/Services/Interfaces/I{Entity}Service.cs` |
+| 12 | Domain | Create | `NNews.Domain/Services/{Entity}Service.cs` |
+| 13 | Application | Modify | `NNews.Application/Initializer.cs` (3 registrations) |
+| 14 | API | Create | `NNews.API/Controllers/{Entity}Controller.cs` |
 
 ## Response Guidelines
 
 1. **Read existing files first** to match current patterns exactly
-2. **Follow the order** — Model → Database → Repository → ViewModel → Page → DI → Tests
-3. **Use Note/Category** as primary reference (simplest complete examples)
-4. **Match conventions**: file-scoped namespaces, `[ObservableProperty]`, `[RelayCommand]`, async/await
-5. **SQLite-net**: `[PrimaryKey, AutoIncrement]`, `DateTime.UtcNow`, no EF Core
-6. **UI language**: Portuguese (Brazil) for user-facing strings
+2. **Follow the order** — DTO → Domain → Infra → Application → API
+3. **Use Category** as primary reference (simplest complete example)
+4. **Run migrations** after modifying DbContext
+5. **Match conventions**: snake_case DB, PascalCase C#, factory methods, private setters
+6. **PostgreSQL**: `timestamp without time zone`, `DateTime.SpecifyKind(..., Unspecified)`, sequences

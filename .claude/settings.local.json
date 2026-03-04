@@ -26,7 +26,10 @@
       "Bash(ls:*)",
       "Skill(execute)",
       "Bash(export:*)",
-      "Bash(\"/c/Program Files \\(x86\\)/Android/android-sdk/emulator/emulator.exe\":*)"
+      "Bash(\"/c/Program Files \\(x86\\)/Android/android-sdk/emulator/emulator.exe\":*)",
+      "Bash(mkdir:*)",
+      "Bash(dotnet sln:*)",
+      "Bash(\"C:/Program Files \\(x86\\)/Android/android-sdk/platform-tools/adb.exe\" uninstall:*)"
     ]
   }
 }

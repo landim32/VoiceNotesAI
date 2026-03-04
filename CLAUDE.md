@@ -37,7 +37,7 @@ Recording (AudioService) → Transcription (SpeechToTextService → Whisper API)
 ```
 VoiceNotesAI.Domain        (net8.0)  — Models + Helpers (no dependencies)
 VoiceNotesAI.Infra.Interfaces (net8.0)  — Service interfaces (refs Domain)
-VoiceNotesAI.Infra         (net8.0)  — Service implementations + Data (refs Domain + Infra.Interfaces)
+VoiceNotesAI.Infra         (net8.0)  — Service implementations + Context (refs Domain + Infra.Interfaces)
 VoiceNotesAI               (MAUI)    — UI layer: Pages, ViewModels, Converters (refs all 3)
 VoiceNotesAI.Tests          (net8.0)  — Unit tests (refs Domain + Infra.Interfaces + Infra)
 ```
