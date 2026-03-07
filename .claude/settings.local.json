@@ -50,7 +50,8 @@
       "Read(//c/Program Files/**)",
       "Read(//c/repos/VoiceNotesAI/$JAVA_HOME/bin/**)",
       "Bash(\"C:/Program Files/Android/jdk/jdk-8.0.302.8-hotspot/jdk8u302-b08/bin/keytool.exe\":*)",
-      "Bash(gh secret:*)"
+      "Bash(gh secret:*)",
+      "Bash(unzip:*)"
     ]
   }
 }

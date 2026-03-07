@@ -50,4 +50,8 @@
     <EmbeddedResource Include="appsettings.json" />
   </ItemGroup>
 
+  <ItemGroup>
+    <TrimmerRootDescriptor Include="LinkerConfig.xml" />
+  </ItemGroup>
+
 </Project>

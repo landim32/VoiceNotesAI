@@ -6,6 +6,9 @@
 # Keystore
 keystore/
 
+# Bug reports
+bugreports/
+
 # User-specific files
 *.rsuser
 *.suo

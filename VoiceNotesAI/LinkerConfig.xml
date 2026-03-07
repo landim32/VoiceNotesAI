@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<linker>
+  <assembly fullname="AutoMapper" preserve="all" />
+  <assembly fullname="VoiceNotesAI.Infra" preserve="all" />
+  <assembly fullname="VoiceNotesAI.Domain" preserve="all" />
+  <assembly fullname="VoiceNotesAI.DTO" preserve="all" />
+</linker>
