@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using VoiceNotesAI.DTOs;
 using VoiceNotesAI.AppServices;
+using VoiceNotesAI.Helpers;
 using VoiceNotesAI.Services.Interfaces;
 
 namespace VoiceNotesAI.ViewModels;
@@ -10,16 +11,22 @@ public partial class RecordingViewModel : ObservableObject
 {
     private readonly IAudioAppService _audioService;
     private readonly ISpeechToTextAppService _speechToTextService;
-    private readonly IAIAppService _aiService;
+    private readonly INoteService _noteService;
+    private readonly ISettingService _settingService;
+    private readonly OpenAISettings _openAISettings;
 
     public RecordingViewModel(
         IAudioAppService audioService,
         ISpeechToTextAppService speechToTextService,
-        IAIAppService aiService)
+        INoteService noteService,
+        ISettingService settingService,
+        OpenAISettings openAISettings)
     {
         _audioService = audioService;
         _speechToTextService = speechToTextService;
-        _aiService = aiService;
+        _noteService = noteService;
+        _settingService = settingService;
+        _openAISettings = openAISettings;
     }
 
     [ObservableProperty]
@@ -40,6 +47,20 @@ public partial class RecordingViewModel : ObservableObject
     [RelayCommand]
     private async Task StartRecordingAsync()
     {
+        var apiKey = _openAISettings.ApiKey;
+        if (string.IsNullOrWhiteSpace(apiKey))
+            apiKey = await _settingService.GetAsync(SettingsViewModel.ApiKeySettingKey);
+
+        if (string.IsNullOrWhiteSpace(apiKey))
+        {
+            await Shell.Current.DisplayAlert(
+                "Configuração necessária",
+                "A chave da API do OpenAI não está configurada. Configure-a nas opções antes de gravar.",
+                "Ir para Opções");
+            await Shell.Current.GoToAsync("//SettingsPage");
+            return;
+        }
+
         var status = await Permissions.RequestAsync<Permissions.Microphone>();
         if (status != PermissionStatus.Granted)
         {
@@ -78,17 +99,21 @@ public partial class RecordingViewModel : ObservableObject
         {
             TranscribedText = await _speechToTextService.TranscribeAsync(AudioFilePath);
 
-            StatusMessage = "Interpretando com IA...";
-            var result = await _aiService.InterpretNoteAsync(TranscribedText);
+            StatusMessage = "Salvando nota...";
+            var noteInfo = new NoteInfo
+            {
+                Description = TranscribedText,
+                AudioFilePath = AudioFilePath
+            };
+
+            var saved = await _noteService.SaveAsync(noteInfo);
 
             var parameters = new Dictionary<string, object>
             {
-                { "NoteResult", result },
-                { "AudioFilePath", AudioFilePath },
-                { "TranscribedText", TranscribedText }
+                { "NoteInfo", saved }
             };
 
-            await Shell.Current.GoToAsync("NoteResultPage", parameters);
+            await Shell.Current.GoToAsync("//NoteListPage/NoteDetailPage", parameters);
         }
         catch (Exception ex)
         {

@@ -212,6 +212,26 @@
             </VerticalStackLayout>
         </Grid>
 
+        <!-- Improving with AI Overlay -->
+        <Grid IsVisible="{Binding IsImproving}"
+              BackgroundColor="#CC000000"
+              HorizontalOptions="Fill"
+              VerticalOptions="Fill">
+            <VerticalStackLayout VerticalOptions="Center"
+                                 HorizontalOptions="Center"
+                                 Spacing="20">
+                <ActivityIndicator IsRunning="True"
+                                   Color="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"
+                                   WidthRequest="48"
+                                   HeightRequest="48" />
+                <Label Text="Melhorando com IA..."
+                       FontSize="18"
+                       FontAttributes="Bold"
+                       TextColor="White"
+                       HorizontalOptions="Center" />
+            </VerticalStackLayout>
+        </Grid>
+
         <!-- Consolidating Overlay -->
         <Grid IsVisible="{Binding IsConsolidating}"
               BackgroundColor="#CC000000"
@@ -249,6 +269,38 @@
                              VerticalOptions="End"
                              Margin="0,0,8,96"
                              Spacing="12">
+
+            <!-- Improve with AI Option -->
+            <HorizontalStackLayout Spacing="10" HorizontalOptions="End">
+                <Label Text="Melhorar com IA"
+                       FontSize="14"
+                       FontAttributes="Bold"
+                       TextColor="{StaticResource White}"
+                       VerticalOptions="Center"
+                       Padding="10,6"
+                       BackgroundColor="#CC333333">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding ImproveWithAICommand}" />
+                    </Label.GestureRecognizers>
+                </Label>
+                <Border StrokeThickness="0"
+                        WidthRequest="48"
+                        HeightRequest="48"
+                        BackgroundColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"
+                        Shadow="{Shadow Brush=Black, Offset='1,2', Radius=4, Opacity=0.3}"
+                        StrokeShape="RoundRectangle 24">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding ImproveWithAICommand}" />
+                    </Border.GestureRecognizers>
+                    <Path Data="M19 9l1.25-2.75L23 5l-2.75-1.25L19 1l-1.25 2.75L15 5l2.75 1.25L19 9zM11.5 9.5L9 4 6.5 9.5 1 12l5.5 2.5L9 20l2.5-5.5L17 12l-5.5-2.5z"
+                          Fill="White"
+                          Aspect="Uniform"
+                          WidthRequest="22"
+                          HeightRequest="22"
+                          HorizontalOptions="Center"
+                          VerticalOptions="Center" />
+                </Border>
+            </HorizontalStackLayout>
 
             <!-- Consolidate with AI Option -->
             <HorizontalStackLayout Spacing="10" HorizontalOptions="End">

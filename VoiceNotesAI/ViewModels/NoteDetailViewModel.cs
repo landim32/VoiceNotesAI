@@ -78,6 +78,9 @@ public partial class NoteDetailViewModel : ObservableObject, IQueryAttributable
     private bool _isConsolidating;
 
     [ObservableProperty]
+    private bool _isImproving;
+
+    [ObservableProperty]
     private string _recordingStatus = string.Empty;
 
     public void ApplyQueryAttributes(IDictionary<string, object> query)
@@ -315,6 +318,43 @@ public partial class NoteDetailViewModel : ObservableObject, IQueryAttributable
         finally
         {
             IsConsolidating = false;
+        }
+    }
+
+    [RelayCommand]
+    private async Task ImproveWithAIAsync()
+    {
+        IsFabMenuOpen = false;
+
+        await EnsureNoteSavedAsync();
+
+        IsImproving = true;
+
+        try
+        {
+            var result = await _aiService.InterpretNoteAsync(Description);
+
+            Title = result.Title;
+            Description = result.Description;
+            Category = result.Category;
+
+            var noteInfo = new NoteInfo
+            {
+                Id = NoteId,
+                Title = Title,
+                Description = Description,
+                Category = Category,
+                AudioFilePath = AudioFilePath
+            };
+            await _noteService.SaveAsync(noteInfo);
+        }
+        catch (Exception ex)
+        {
+            await Shell.Current.DisplayAlert("Erro", $"Erro ao melhorar com IA: {ex.Message}", "OK");
+        }
+        finally
+        {
+            IsImproving = false;
         }
     }
 

@@ -38,7 +38,14 @@
       "Bash(xargs grep -l \"class.*Converter\\\\|class.*Mapper\\\\|class.*Profile\")",
       "Bash(dotnet new:*)",
       "Bash(python3:*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(\"/c/Program Files \\(x86\\)/Android/android-sdk/platform-tools/adb.exe\":*)",
+      "Bash(\"$LOCALAPPDATA/Android/Sdk/emulator/emulator.exe\":*)",
+      "Bash(\"$LOCALAPPDATA/Android/Sdk/platform-tools/adb.exe\":*)",
+      "Bash(ADB=:*)",
+      "Bash(for:*)",
+      "Bash(\"$LOCALAPPDATA/Android/Sdk/platform-tools/adb.exe\" devices:*)",
+      "Bash(grep:*)"
     ]
   }
 }
