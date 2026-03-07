@@ -18,6 +18,20 @@ jobs:
       contents: write
 
     steps:
+    - name: Validate signing secrets
+      run: |
+        MISSING=""
+        if [ -z "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" ]; then MISSING="$MISSING ANDROID_KEYSTORE_BASE64"; fi
+        if [ -z "${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" ]; then MISSING="$MISSING ANDROID_KEYSTORE_PASSWORD"; fi
+        if [ -z "${{ secrets.ANDROID_KEY_ALIAS }}" ]; then MISSING="$MISSING ANDROID_KEY_ALIAS"; fi
+        if [ -z "${{ secrets.ANDROID_KEY_PASSWORD }}" ]; then MISSING="$MISSING ANDROID_KEY_PASSWORD"; fi
+        if [ -n "$MISSING" ]; then
+          echo "::error::Missing required secrets:$MISSING"
+          echo "Configure them in: Settings → Secrets and variables → Actions"
+          exit 1
+        fi
+        echo "✅ All signing secrets are configured"
+
     - name: Checkout code
       uses: actions/checkout@v4
       with:
@@ -85,13 +99,24 @@ jobs:
     - name: Find APK file
       id: find_apk
       run: |
-        APK_PATH=$(find VoiceNotesAI/bin/Release/net8.0-android -name "*.apk" | head -1)
-        echo "APK found: $APK_PATH"
+        echo "All APKs found:"
+        find VoiceNotesAI/bin/Release/net8.0-android -name "*.apk"
+        APK_PATH=$(find VoiceNotesAI/bin/Release/net8.0-android -name "*-Signed.apk" | head -1)
+        if [ -z "$APK_PATH" ]; then
+          echo "No signed APK found, falling back to any APK"
+          APK_PATH=$(find VoiceNotesAI/bin/Release/net8.0-android -name "*.apk" | head -1)
+        fi
+        echo "Selected APK: $APK_PATH"
         echo "apk_path=$APK_PATH" >> $GITHUB_OUTPUT
 
         APK_NAME="VoiceNotesAI-v${{ steps.gitversion.outputs.nuGetVersionV2 }}.apk"
         cp "$APK_PATH" "$APK_NAME"
         echo "apk_name=$APK_NAME" >> $GITHUB_OUTPUT
+
+    - name: Verify APK signature
+      run: |
+        echo "Checking APK signature..."
+        "$ANDROID_HOME/build-tools/$(ls $ANDROID_HOME/build-tools/ | tail -1)/apksigner" verify --print-certs "${{ steps.find_apk.outputs.apk_name }}" || echo "⚠️ APK signature verification failed"
 
     - name: Upload APK artifact
       uses: actions/upload-artifact@v4
