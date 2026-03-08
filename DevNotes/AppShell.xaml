@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+       xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+       xmlns:pages="clr-namespace:DevNotes.Pages"
+       x:Class="DevNotes.AppShell"
+       Title="VoiceNotes AI"
+       FlyoutBehavior="Flyout"
+       Shell.BackgroundColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Gray950}}"
+       Shell.ForegroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Primary}}"
+       Shell.TitleColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Primary}}"
+       FlyoutBackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}">
+
+    <Shell.FlyoutHeader>
+        <Grid HeightRequest="140"
+              BackgroundColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Accent}}"
+              Padding="20">
+            <VerticalStackLayout VerticalOptions="End" Spacing="4">
+                <Label Text="VoiceNotes AI"
+                       FontSize="22"
+                       FontAttributes="Bold"
+                       TextColor="{StaticResource White}" />
+                <Label Text="Suas notas de voz inteligentes"
+                       FontSize="13"
+                       TextColor="#80FFFFFF" />
+            </VerticalStackLayout>
+        </Grid>
+    </Shell.FlyoutHeader>
+
+    <FlyoutItem Title="Notas" FlyoutItemIsVisible="False">
+        <ShellContent
+            ContentTemplate="{DataTemplate pages:NoteListPage}"
+            Route="NoteListPage" />
+    </FlyoutItem>
+
+    <FlyoutItem Title="Categorias" FlyoutItemIsVisible="False">
+        <ShellContent
+            ContentTemplate="{DataTemplate pages:CategoryListPage}"
+            Route="CategoryListPage" />
+    </FlyoutItem>
+
+    <FlyoutItem Title="Configurações" FlyoutItemIsVisible="False">
+        <ShellContent
+            ContentTemplate="{DataTemplate pages:SettingsPage}"
+            Route="SettingsPage" />
+    </FlyoutItem>
+
+    <Shell.FlyoutContent>
+        <ScrollView>
+            <VerticalStackLayout Spacing="0"
+                                 BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}">
+
+                <!-- Section: NOTAS -->
+                <Label Text="NOTAS"
+                       FontSize="12"
+                       FontAttributes="Bold"
+                       TextColor="{AppThemeBinding Light={StaticResource Gray400}, Dark={StaticResource Gray500}}"
+                       Margin="20,20,20,8" />
+
+                <VerticalStackLayout x:Name="MenuNotaDeVoz" Padding="20,12" BackgroundColor="Transparent">
+                    <VerticalStackLayout.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnNotaDeVozTapped" />
+                    </VerticalStackLayout.GestureRecognizers>
+                    <HorizontalStackLayout Spacing="14">
+                        <Path Data="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"
+                              Fill="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}"
+                              Aspect="Uniform" WidthRequest="22" HeightRequest="22" VerticalOptions="Center" />
+                        <Label Text="Nota de Voz"
+                               FontSize="15"
+                               VerticalOptions="Center"
+                               TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}" />
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+
+                <VerticalStackLayout x:Name="MenuNotaDeTexto" Padding="20,12" BackgroundColor="Transparent">
+                    <VerticalStackLayout.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnNotaDeTextoTapped" />
+                    </VerticalStackLayout.GestureRecognizers>
+                    <HorizontalStackLayout Spacing="14">
+                        <Path Data="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.9959.9959 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
+                              Fill="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}"
+                              Aspect="Uniform" WidthRequest="22" HeightRequest="22" VerticalOptions="Center" />
+                        <Label Text="Nota de Texto"
+                               FontSize="15"
+                               VerticalOptions="Center"
+                               TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}" />
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+
+                <!-- Divider -->
+                <BoxView HeightRequest="1"
+                         Color="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}"
+                         Margin="20,8" />
+
+                <!-- Section: LISTAS -->
+                <Label Text="LISTAS"
+                       FontSize="12"
+                       FontAttributes="Bold"
+                       TextColor="{AppThemeBinding Light={StaticResource Gray400}, Dark={StaticResource Gray500}}"
+                       Margin="20,12,20,8" />
+
+                <VerticalStackLayout x:Name="MenuMinhasNotas" Padding="20,12" BackgroundColor="Transparent">
+                    <VerticalStackLayout.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnMinhasNotasTapped" />
+                    </VerticalStackLayout.GestureRecognizers>
+                    <HorizontalStackLayout Spacing="14">
+                        <Path Data="M14 2H6C4.9 2 4 2.9 4 4v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zM6 20V4h7v5h5v11H6z M8 12h8v2H8zm0 4h5v2H8z"
+                              Fill="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}"
+                              Aspect="Uniform" WidthRequest="22" HeightRequest="22" VerticalOptions="Center" />
+                        <Label Text="Minhas Notas"
+                               FontSize="15"
+                               VerticalOptions="Center"
+                               TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}" />
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+
+                <VerticalStackLayout x:Name="MenuCategorias" Padding="20,12" BackgroundColor="Transparent">
+                    <VerticalStackLayout.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnCategoriasTapped" />
+                    </VerticalStackLayout.GestureRecognizers>
+                    <HorizontalStackLayout Spacing="14">
+                        <Path Data="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"
+                              Fill="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}"
+                              Aspect="Uniform" WidthRequest="22" HeightRequest="22" VerticalOptions="Center" />
+                        <Label Text="Categorias"
+                               FontSize="15"
+                               VerticalOptions="Center"
+                               TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}" />
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+
+                <!-- Divider -->
+                <BoxView HeightRequest="1"
+                         Color="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}"
+                         Margin="20,8" />
+
+                <!-- Section: CONFIGURAÇÕES -->
+                <Label Text="CONFIGURAÇÕES"
+                       FontSize="12"
+                       FontAttributes="Bold"
+                       TextColor="{AppThemeBinding Light={StaticResource Gray400}, Dark={StaticResource Gray500}}"
+                       Margin="20,12,20,8" />
+
+                <VerticalStackLayout x:Name="MenuOpcoes" Padding="20,12" BackgroundColor="Transparent">
+                    <VerticalStackLayout.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnOpcoesTapped" />
+                    </VerticalStackLayout.GestureRecognizers>
+                    <HorizontalStackLayout Spacing="14">
+                        <Path Data="M19.14,12.94 C19.18,12.63 19.2,12.31 19.2,12 C19.2,11.69 19.18,11.37 19.14,11.06 L21.17,9.48 C21.36,9.32 21.41,9.05 21.29,8.87 L19.37,5.55 C19.25,5.33 18.99,5.26 18.78,5.33 L16.39,6.29 C15.9,5.92 15.36,5.59 14.77,5.35 L14.41,2.81 C14.38,2.57 14.17,2.4 13.93,2.4 L10.09,2.4 C9.85,2.4 9.64,2.57 9.61,2.81 L9.25,5.35 C8.66,5.59 8.12,5.92 7.63,6.29 L5.24,5.33 C5.02,5.25 4.77,5.33 4.65,5.55 L2.74,8.87 C2.62,9.09 2.67,9.34 2.86,9.48 L4.89,11.06 C4.85,11.37 4.83,11.69 4.83,12 C4.83,12.31 4.85,12.63 4.89,12.94 L2.86,14.52 C2.67,14.68 2.62,14.95 2.74,15.13 L4.65,18.45 C4.77,18.67 5.02,18.74 5.24,18.67 L7.63,17.71 C8.12,18.08 8.66,18.41 9.25,18.65 L9.61,21.19 C9.64,21.43 9.85,21.6 10.09,21.6 L13.93,21.6 C14.17,21.6 14.38,21.43 14.41,21.19 L14.77,18.65 C15.36,18.41 15.9,18.08 16.39,17.71 L18.78,18.67 C19,18.75 19.25,18.67 19.37,18.45 L21.29,15.13 C21.41,14.91 21.36,14.66 21.17,14.52 L19.14,12.94 Z M12,15.6 C10.01,15.6 8.4,13.99 8.4,12 C8.4,10.01 10.01,8.4 12,8.4 C13.99,8.4 15.6,10.01 15.6,12 C15.6,13.99 13.99,15.6 12,15.6 Z"
+                              Fill="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}"
+                              Aspect="Uniform" WidthRequest="22" HeightRequest="22" VerticalOptions="Center" />
+                        <Label Text="Opções"
+                               FontSize="15"
+                               VerticalOptions="Center"
+                               TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}" />
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+
+            </VerticalStackLayout>
+        </ScrollView>
+    </Shell.FlyoutContent>
+
+</Shell>

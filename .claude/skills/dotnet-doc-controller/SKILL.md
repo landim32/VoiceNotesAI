@@ -1,12 +1,12 @@
 ---
 name: dotnet-doc-controller
-description: Generates comprehensive documentation for a VoiceNotesAI service or ViewModel. Use when the user wants to document services, ViewModels, or create technical reference documentation.
+description: Generates comprehensive documentation for a DevNotes service or ViewModel. Use when the user wants to document services, ViewModels, or create technical reference documentation.
 allowed-tools: Read, Grep, Glob, Bash, Write, Task
 ---
 
 # Generate Technical Documentation for a Service or ViewModel
 
-You are a documentation generator for the VoiceNotesAI .NET MAUI application. Your task is to create comprehensive, concise technical documentation in Markdown format.
+You are a documentation generator for the DevNotes .NET MAUI application. Your task is to create comprehensive, concise technical documentation in Markdown format.
 
 ## Input
 

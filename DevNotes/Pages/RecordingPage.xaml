@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:DevNotes.ViewModels"
+             x:Class="DevNotes.Pages.RecordingPage"
+             x:DataType="vm:RecordingViewModel"
+             Title="Gravar Nota"
+             BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}">
+
+    <Grid RowDefinitions="*,Auto,Auto" Padding="24">
+
+        <!-- Visual Feedback Area -->
+        <VerticalStackLayout Grid.Row="0"
+                             VerticalOptions="Center"
+                             HorizontalOptions="Center"
+                             Spacing="20">
+
+            <!-- Mic Icon -->
+            <Frame WidthRequest="140"
+                   HeightRequest="140"
+                   CornerRadius="70"
+                   Padding="0"
+                   BorderColor="Transparent"
+                   HorizontalOptions="Center"
+                   BackgroundColor="{AppThemeBinding Light=#FDE8E0, Dark=#2A1510}">
+                <Label Text="🎙️"
+                       FontSize="60"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center" />
+            </Frame>
+
+            <!-- Status -->
+            <Label Text="{Binding StatusMessage}"
+                   FontSize="18"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center"
+                   TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray200}}" />
+        </VerticalStackLayout>
+
+        <!-- Processing Indicator -->
+        <VerticalStackLayout Grid.Row="1"
+                             IsVisible="{Binding IsProcessing}"
+                             Spacing="8"
+                             Margin="0,0,0,16">
+            <ActivityIndicator IsRunning="{Binding IsProcessing}"
+                               Color="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}" />
+            <Label Text="Processando..."
+                   FontSize="14"
+                   HorizontalOptions="Center"
+                   TextColor="{AppThemeBinding Light={StaticResource Gray400}, Dark={StaticResource Gray400}}" />
+        </VerticalStackLayout>
+
+        <!-- Stop Button (only visible while recording) -->
+        <Button Grid.Row="2"
+                Text="⏹  Parar Gravação"
+                Command="{Binding StopRecordingCommand}"
+                IsVisible="{Binding IsRecording}"
+                FontSize="18"
+                FontAttributes="Bold"
+                HeightRequest="60"
+                CornerRadius="30"
+                Margin="0,0,0,16"
+                BackgroundColor="#E53935"
+                TextColor="{StaticResource White}" />
+    </Grid>
+
+</ContentPage>
