@@ -15,19 +15,19 @@
 
                 <!-- Created At -->
                 <Label Text="{Binding CreatedAt, StringFormat='Criada em {0:dd/MM/yyyy HH:mm}'}"
-                       FontSize="12"
+                       FontSize="14"
                        IsVisible="{Binding IsNewNote, Converter={StaticResource InvertedBoolConverter}}"
                        TextColor="{AppThemeBinding Light={StaticResource Gray400}, Dark={StaticResource Gray500}}" />
 
                 <!-- Notas (Description - primary field) -->
                 <VerticalStackLayout Spacing="4">
                     <Label Text="Notas"
-                           FontSize="13"
+                           FontSize="15"
                            FontAttributes="Bold"
                            TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}" />
                     <Editor Text="{Binding Description}"
                             Placeholder="Conteúdo da nota"
-                            FontSize="14"
+                            FontSize="16"
                             HeightRequest="200"
                             AutoSize="TextChanges"
                             BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}"
@@ -38,7 +38,7 @@
                 <!-- Category -->
                 <VerticalStackLayout Spacing="4">
                     <Label Text="Categoria"
-                           FontSize="13"
+                           FontSize="15"
                            FontAttributes="Bold"
                            TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}" />
                     <Picker Title="Selecione a categoria"
@@ -51,12 +51,12 @@
                 <!-- Title (optional) -->
                 <VerticalStackLayout Spacing="4">
                     <Label Text="Título (opcional)"
-                           FontSize="13"
+                           FontSize="15"
                            FontAttributes="Bold"
                            TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}" />
                     <Entry Text="{Binding Title}"
                            Placeholder="Preenchido automaticamente se vazio"
-                           FontSize="16"
+                           FontSize="18"
                            BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}"
                            TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}"
                            PlaceholderColor="{StaticResource Gray400}" />
@@ -66,7 +66,7 @@
                 <VerticalStackLayout Spacing="8"
                                      IsVisible="{Binding IsNewNote, Converter={StaticResource InvertedBoolConverter}}">
                     <Label Text="Comentários"
-                           FontSize="13"
+                           FontSize="15"
                            FontAttributes="Bold"
                            TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}" />
 
@@ -91,10 +91,10 @@
                                            BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}">
                                         <VerticalStackLayout Spacing="4">
                                             <Label Text="{Binding Content}"
-                                                   FontSize="13"
+                                                   FontSize="15"
                                                    TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}" />
                                             <Label Text="{Binding CreatedAt, StringFormat='{0:dd/MM/yyyy HH:mm}'}"
-                                                   FontSize="11"
+                                                   FontSize="13"
                                                    TextColor="{AppThemeBinding Light={StaticResource Gray400}, Dark={StaticResource Gray500}}" />
                                         </VerticalStackLayout>
                                     </Frame>
@@ -104,7 +104,7 @@
 
                         <CollectionView.EmptyView>
                             <Label Text="Nenhum comentário ainda"
-                                   FontSize="13"
+                                   FontSize="15"
                                    FontAttributes="Italic"
                                    HorizontalOptions="Center"
                                    Margin="0,8"
@@ -119,7 +119,7 @@
                     <Button Grid.Column="0"
                             Text="Excluir"
                             Command="{Binding DeleteCommand}"
-                            FontSize="15"
+                            FontSize="17"
                             HeightRequest="50"
                             CornerRadius="25"
                             BackgroundColor="#E53935"
@@ -129,7 +129,7 @@
                             Text="Salvar"
                             Command="{Binding SaveCommand}"
                             IsEnabled="{Binding IsSaving, Converter={StaticResource InvertedBoolConverter}}"
-                            FontSize="15"
+                            FontSize="17"
                             FontAttributes="Bold"
                             HeightRequest="50"
                             CornerRadius="25"
@@ -142,7 +142,7 @@
                         Command="{Binding SaveCommand}"
                         IsVisible="{Binding IsNewNote}"
                         IsEnabled="{Binding IsSaving, Converter={StaticResource InvertedBoolConverter}}"
-                        FontSize="15"
+                        FontSize="17"
                         FontAttributes="Bold"
                         HeightRequest="50"
                         CornerRadius="25"
@@ -175,13 +175,13 @@
                                    WidthRequest="48"
                                    HeightRequest="48" />
                 <Label Text="{Binding RecordingStatus}"
-                       FontSize="18"
+                       FontSize="20"
                        FontAttributes="Bold"
                        TextColor="White"
                        HorizontalOptions="Center" />
                 <Button Text="Parar Gravação"
                         Command="{Binding StopVoiceCommentCommand}"
-                        FontSize="15"
+                        FontSize="17"
                         FontAttributes="Bold"
                         HeightRequest="50"
                         CornerRadius="25"
@@ -205,7 +205,7 @@
                                    WidthRequest="48"
                                    HeightRequest="48" />
                 <Label Text="Transcrevendo..."
-                       FontSize="18"
+                       FontSize="20"
                        FontAttributes="Bold"
                        TextColor="White"
                        HorizontalOptions="Center" />
@@ -225,7 +225,7 @@
                                    WidthRequest="48"
                                    HeightRequest="48" />
                 <Label Text="Melhorando com IA..."
-                       FontSize="18"
+                       FontSize="20"
                        FontAttributes="Bold"
                        TextColor="White"
                        HorizontalOptions="Center" />
@@ -245,7 +245,7 @@
                                    WidthRequest="48"
                                    HeightRequest="48" />
                 <Label Text="Consolidando com IA..."
-                       FontSize="18"
+                       FontSize="20"
                        FontAttributes="Bold"
                        TextColor="White"
                        HorizontalOptions="Center" />
@@ -273,7 +273,7 @@
             <!-- Improve with AI Option -->
             <HorizontalStackLayout Spacing="10" HorizontalOptions="End">
                 <Label Text="Melhorar com IA"
-                       FontSize="14"
+                       FontSize="16"
                        FontAttributes="Bold"
                        TextColor="{StaticResource White}"
                        VerticalOptions="Center"
@@ -305,7 +305,7 @@
             <!-- Consolidate with AI Option -->
             <HorizontalStackLayout Spacing="10" HorizontalOptions="End">
                 <Label Text="Consolidar com IA"
-                       FontSize="14"
+                       FontSize="16"
                        FontAttributes="Bold"
                        TextColor="{StaticResource White}"
                        VerticalOptions="Center"
@@ -337,7 +337,7 @@
             <!-- Text Comment Option -->
             <HorizontalStackLayout Spacing="10" HorizontalOptions="End">
                 <Label Text="Comentário em Texto"
-                       FontSize="14"
+                       FontSize="16"
                        FontAttributes="Bold"
                        TextColor="{StaticResource White}"
                        VerticalOptions="Center"
@@ -369,7 +369,7 @@
             <!-- Voice Comment Option -->
             <HorizontalStackLayout Spacing="10" HorizontalOptions="End">
                 <Label Text="Comentário em Voz"
-                       FontSize="14"
+                       FontSize="16"
                        FontAttributes="Bold"
                        TextColor="{StaticResource White}"
                        VerticalOptions="Center"
@@ -414,7 +414,7 @@
                 <TapGestureRecognizer Command="{Binding ToggleFabMenuCommand}" />
             </Border.GestureRecognizers>
             <Label Text="{Binding IsFabMenuOpen, Converter={StaticResource FabIconConverter}}"
-                   FontSize="28"
+                   FontSize="30"
                    TextColor="White"
                    HorizontalOptions="Center"
                    VerticalOptions="Center" />

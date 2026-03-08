@@ -51,7 +51,7 @@
                        VerticalOptions="Center"
                        BackgroundColor="{AppThemeBinding Light=#FDE8E0, Dark=#2A1510}">
                     <Label Text="🎙️"
-                           FontSize="60"
+                           FontSize="64"
                            HorizontalOptions="Center"
                            VerticalOptions="Center" />
                 </Frame>
@@ -59,7 +59,7 @@
 
             <!-- Status -->
             <Label Text="{Binding StatusMessage}"
-                   FontSize="18"
+                   FontSize="20"
                    FontAttributes="Bold"
                    HorizontalOptions="Center"
                    TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray200}}" />
@@ -73,7 +73,7 @@
             <ActivityIndicator IsRunning="{Binding IsProcessing}"
                                Color="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}" />
             <Label Text="Processando..."
-                   FontSize="14"
+                   FontSize="16"
                    HorizontalOptions="Center"
                    TextColor="{AppThemeBinding Light={StaticResource Gray400}, Dark={StaticResource Gray400}}" />
         </VerticalStackLayout>
@@ -83,7 +83,7 @@
                 Text="⏹  Parar Gravação"
                 Command="{Binding StopRecordingCommand}"
                 IsVisible="{Binding IsRecording}"
-                FontSize="18"
+                FontSize="20"
                 FontAttributes="Bold"
                 HeightRequest="60"
                 CornerRadius="30"

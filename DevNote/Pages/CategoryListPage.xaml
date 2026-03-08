@@ -25,15 +25,15 @@
                              HorizontalOptions="Center"
                              Spacing="12">
             <Label Text="📂"
-                   FontSize="48"
+                   FontSize="52"
                    HorizontalOptions="Center" />
             <Label Text="Nenhuma categoria"
-                   FontSize="18"
+                   FontSize="20"
                    FontAttributes="Bold"
                    HorizontalOptions="Center"
                    TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}" />
             <Label Text="Adicione sua primeira categoria!"
-                   FontSize="14"
+                   FontSize="16"
                    HorizontalOptions="Center"
                    TextColor="{AppThemeBinding Light={StaticResource Gray400}, Dark={StaticResource Gray400}}" />
         </VerticalStackLayout>
@@ -67,7 +67,7 @@
                             </Frame.GestureRecognizers>
 
                             <Label Text="{Binding Name}"
-                                   FontSize="16"
+                                   FontSize="18"
                                    FontAttributes="Bold"
                                    TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}"
                                    VerticalOptions="Center" />
@@ -81,7 +81,7 @@
         <Button Grid.Row="1"
                 Text="＋  Nova Categoria"
                 Command="{Binding AddCategoryCommand}"
-                FontSize="16"
+                FontSize="18"
                 FontAttributes="Bold"
                 HeightRequest="56"
                 CornerRadius="28"

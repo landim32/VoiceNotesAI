@@ -12,12 +12,12 @@
 
             <!-- Header -->
             <Label Text="Configurações da API"
-                   FontSize="20"
+                   FontSize="22"
                    FontAttributes="Bold"
                    TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}" />
 
             <Label Text="Configure os modelos da OpenAI"
-                   FontSize="13"
+                   FontSize="15"
                    TextColor="{AppThemeBinding Light={StaticResource Gray400}, Dark={StaticResource Gray400}}" />
 
             <!-- Loading -->
@@ -28,7 +28,7 @@
             <!-- GPT Model -->
             <VerticalStackLayout Spacing="4">
                 <Label Text="Modelo GPT"
-                       FontSize="13"
+                       FontSize="15"
                        FontAttributes="Bold"
                        TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}" />
                 <Picker Title="Selecione o modelo GPT"
@@ -41,7 +41,7 @@
             <!-- Whisper Model -->
             <VerticalStackLayout Spacing="4">
                 <Label Text="Modelo de Transcrição"
-                       FontSize="13"
+                       FontSize="15"
                        FontAttributes="Bold"
                        TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}" />
                 <Picker Title="Selecione o modelo de transcrição"
@@ -55,7 +55,7 @@
             <Button Text="Salvar Configurações"
                     Command="{Binding SaveSettingsCommand}"
                     IsEnabled="{Binding IsSaving, Converter={StaticResource InvertedBoolConverter}}"
-                    FontSize="16"
+                    FontSize="18"
                     FontAttributes="Bold"
                     HeightRequest="56"
                     CornerRadius="28"

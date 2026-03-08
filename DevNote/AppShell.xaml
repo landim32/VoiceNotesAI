@@ -16,11 +16,11 @@
               Padding="20">
             <VerticalStackLayout VerticalOptions="End" Spacing="4">
                 <Label Text="DevNote"
-                       FontSize="22"
+                       FontSize="24"
                        FontAttributes="Bold"
                        TextColor="{StaticResource White}" />
                 <Label Text="Suas notas de voz inteligentes"
-                       FontSize="13"
+                       FontSize="17"
                        TextColor="#80FFFFFF" />
             </VerticalStackLayout>
         </Grid>
@@ -51,7 +51,7 @@
 
                 <!-- Section: NOTAS -->
                 <Label Text="NOTAS"
-                       FontSize="12"
+                       FontSize="14"
                        FontAttributes="Bold"
                        TextColor="{AppThemeBinding Light={StaticResource Gray400}, Dark={StaticResource Gray500}}"
                        Margin="20,20,20,8" />
@@ -65,7 +65,7 @@
                               Fill="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}"
                               Aspect="Uniform" WidthRequest="22" HeightRequest="22" VerticalOptions="Center" />
                         <Label Text="Nota de Voz"
-                               FontSize="15"
+                               FontSize="17"
                                VerticalOptions="Center"
                                TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}" />
                     </HorizontalStackLayout>
@@ -80,7 +80,7 @@
                               Fill="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}"
                               Aspect="Uniform" WidthRequest="22" HeightRequest="22" VerticalOptions="Center" />
                         <Label Text="Nota de Texto"
-                               FontSize="15"
+                               FontSize="17"
                                VerticalOptions="Center"
                                TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}" />
                     </HorizontalStackLayout>
@@ -93,7 +93,7 @@
 
                 <!-- Section: LISTAS -->
                 <Label Text="LISTAS"
-                       FontSize="12"
+                       FontSize="14"
                        FontAttributes="Bold"
                        TextColor="{AppThemeBinding Light={StaticResource Gray400}, Dark={StaticResource Gray500}}"
                        Margin="20,12,20,8" />
@@ -107,7 +107,7 @@
                               Fill="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}"
                               Aspect="Uniform" WidthRequest="22" HeightRequest="22" VerticalOptions="Center" />
                         <Label Text="Minhas Notas"
-                               FontSize="15"
+                               FontSize="17"
                                VerticalOptions="Center"
                                TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}" />
                     </HorizontalStackLayout>
@@ -122,7 +122,7 @@
                               Fill="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}"
                               Aspect="Uniform" WidthRequest="22" HeightRequest="22" VerticalOptions="Center" />
                         <Label Text="Categorias"
-                               FontSize="15"
+                               FontSize="17"
                                VerticalOptions="Center"
                                TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}" />
                     </HorizontalStackLayout>
@@ -135,7 +135,7 @@
 
                 <!-- Section: CONFIGURAÇÕES -->
                 <Label Text="CONFIGURAÇÕES"
-                       FontSize="12"
+                       FontSize="14"
                        FontAttributes="Bold"
                        TextColor="{AppThemeBinding Light={StaticResource Gray400}, Dark={StaticResource Gray500}}"
                        Margin="20,12,20,8" />
@@ -149,7 +149,7 @@
                               Fill="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}"
                               Aspect="Uniform" WidthRequest="22" HeightRequest="22" VerticalOptions="Center" />
                         <Label Text="Opções"
-                               FontSize="15"
+                               FontSize="17"
                                VerticalOptions="Center"
                                TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}" />
                     </HorizontalStackLayout>
