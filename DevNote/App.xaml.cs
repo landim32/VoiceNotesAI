@@ -20,10 +20,6 @@ public partial class App : Application
 
     private static async Task LoadSettingsFromDbAsync(ISettingsRepository settingsRepository, OpenAISettings openAISettings)
     {
-        var apiKey = await settingsRepository.GetAsync(SettingsViewModel.ApiKeySettingKey);
-        if (!string.IsNullOrWhiteSpace(apiKey))
-            openAISettings.ApiKey = apiKey;
-
         var whisperModel = await settingsRepository.GetAsync(SettingsViewModel.WhisperModelSettingKey);
         if (!string.IsNullOrWhiteSpace(whisperModel))
             openAISettings.WhisperModel = whisperModel;

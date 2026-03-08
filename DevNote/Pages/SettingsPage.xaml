@@ -16,7 +16,7 @@
                    FontAttributes="Bold"
                    TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}" />
 
-            <Label Text="Configure as credenciais e modelos da OpenAI"
+            <Label Text="Configure os modelos da OpenAI"
                    FontSize="13"
                    TextColor="{AppThemeBinding Light={StaticResource Gray400}, Dark={StaticResource Gray400}}" />
 
@@ -24,21 +24,6 @@
             <ActivityIndicator IsRunning="{Binding IsLoading}"
                                IsVisible="{Binding IsLoading}"
                                Color="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}" />
-
-            <!-- API Key -->
-            <VerticalStackLayout Spacing="4">
-                <Label Text="Chave da API (OpenAI)"
-                       FontSize="13"
-                       FontAttributes="Bold"
-                       TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}" />
-                <Entry Text="{Binding ApiKey}"
-                       Placeholder="sk-..."
-                       IsPassword="False"
-                       FontSize="14"
-                       BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}"
-                       TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}"
-                       PlaceholderColor="{StaticResource Gray400}" />
-            </VerticalStackLayout>
 
             <!-- GPT Model -->
             <VerticalStackLayout Spacing="4">
