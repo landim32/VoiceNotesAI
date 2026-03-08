@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <RootNamespace>DevNote</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
+    <PackageReference Include="SQLitePCLRaw.bundle_green" Version="2.1.10" />
+    <PackageReference Include="Plugin.Maui.Audio" Version="3.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DevNote.Domain\DevNote.Domain.csproj" />
+    <ProjectReference Include="..\DevNote.DTO\DevNote.DTO.csproj" />
+    <ProjectReference Include="..\DevNote.Infra.Interfaces\DevNote.Infra.Interfaces.csproj" />
+  </ItemGroup>
+
+</Project>

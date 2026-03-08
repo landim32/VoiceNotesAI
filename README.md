@@ -1,14 +1,14 @@
-# DevNotes — Notas de Voz Inteligentes
+# DevNote — Notas de Voz Inteligentes
 
 ![.NET MAUI](https://img.shields.io/badge/.NET_MAUI-8.0-512BD4?logo=dotnet)
 ![Android](https://img.shields.io/badge/Android-21%2B-3DDC84?logo=android)
 ![OpenAI](https://img.shields.io/badge/OpenAI-Whisper%20%2B%20GPT--4-412991?logo=openai)
 ![License](https://img.shields.io/badge/License-MIT-green)
-![Build](https://github.com/landim32/DevNotes/actions/workflows/build-apk.yml/badge.svg)
+![Build](https://github.com/landim32/DevNote/actions/workflows/build-apk.yml/badge.svg)
 
 ## Overview
 
-**DevNotes** is a .NET MAUI Android app that records voice notes and automatically structures them using OpenAI's **Whisper** (speech-to-text) and **GPT-4** (note interpretation) APIs. Simply tap the microphone, speak, and the app transcribes your audio, interprets the content, and generates a structured note with title, description, and category — all in Portuguese (Brazil).
+**DevNote** is a .NET MAUI Android app that records voice notes and automatically structures them using OpenAI's **Whisper** (speech-to-text) and **GPT-4** (note interpretation) APIs. Simply tap the microphone, speak, and the app transcribes your audio, interprets the content, and generates a structured note with title, description, and category — all in Portuguese (Brazil).
 
 Built with **MVVM + layered architecture** across 7 projects using CommunityToolkit.Mvvm, SQLite for local storage, AutoMapper for Model↔DTO mapping, and dependency injection throughout.
 
@@ -71,12 +71,12 @@ The solution follows a **layered architecture** with clear separation of concern
 
 ```
 ┌─────────────────────────────────────────────────┐
-│              DevNotes (MAUI)                │
+│              DevNote (MAUI)                │
 │         Pages, ViewModels, Converters           │
 └────────────────────┬────────────────────────────┘
                      │ uses DTOs via Service interfaces
 ┌────────────────────▼────────────────────────────┐
-│           DevNotes.Application              │
+│           DevNote.Application              │
 │    Service interfaces + implementations + DI    │
 └────────────────────┬────────────────────────────┘
           ┌──────────┼──────────┐
@@ -88,7 +88,7 @@ The solution follows a **layered architecture** with clear separation of concern
 └─────────────┘ └────────┘ └──────────┬───────────┘
                                       │
                            ┌──────────▼───────────┐
-                           │   DevNotes.Infra  │
+                           │   DevNote.Infra  │
                            │ Repos, AppServices,   │
                            │ Context, AutoMapper   │
                            └───────────────────────┘
@@ -110,14 +110,14 @@ ViewModels → Domain Services (DTOs) → Repositories (Domain Models) → SQLit
 ## 📁 Project Structure
 
 ```
-DevNotes/
+DevNote/
 ├── .github/
 │   └── workflows/
 │       ├── version-tag.yml          # Semantic versioning + git tag
 │       ├── create-release.yml       # GitHub Release on minor/major bumps
 │       ├── build-apk.yml           # Build + publish Android APK
 │       └── generate-docs.yml       # XML docs → GitHub Wiki
-├── DevNotes/                    # MAUI app (net8.0-android)
+├── DevNote/                    # MAUI app (net8.0-android)
 │   ├── Converters/                  # 6 IValueConverter implementations
 │   ├── Pages/                       # 7 XAML pages (UI layer)
 │   ├── ViewModels/                  # 7 ViewModels (CommunityToolkit.Mvvm)
@@ -127,34 +127,34 @@ DevNotes/
 │   ├── AppShell.xaml(.cs)           # Flyout navigation (hamburger menu)
 │   ├── MauiProgram.cs              # DI bootstrap
 │   ├── appsettings.example.json     # Configuration template
-│   └── DevNotes.csproj
-├── DevNotes.Domain/             # Domain layer (net8.0)
+│   └── DevNote.csproj
+├── DevNote.Domain/             # Domain layer (net8.0)
 │   ├── Models/                      # SQLite entities (Note, Category, Comment, AppSetting)
 │   ├── Helpers/                     # OpenAISettings, PromptTemplates
 │   └── Services/                    # Domain service interfaces + implementations
-├── DevNotes.DTO/                # Data Transfer Objects (net8.0)
+├── DevNote.DTO/                # Data Transfer Objects (net8.0)
 │   ├── NoteInfo.cs                  # Note DTO
 │   ├── CategoryInfo.cs              # Category DTO
 │   ├── CommentInfo.cs               # Comment DTO
 │   └── NoteResult.cs                # AI response DTO (title, description, category)
-├── DevNotes.Infra.Interfaces/   # Contracts (net8.0)
+├── DevNote.Infra.Interfaces/   # Contracts (net8.0)
 │   ├── Repository/                  # INoteRepository, ICategoryRepository, etc.
 │   └── AppServices/                 # IAIAppService, IAudioAppService, ISpeechToTextAppService
-├── DevNotes.Infra/              # Infrastructure (net8.0)
+├── DevNote.Infra/              # Infrastructure (net8.0)
 │   ├── Context/                     # AppDatabase (SQLite wrapper + seed)
 │   ├── Repository/                  # Repository implementations
 │   ├── AppServices/                 # AI, Audio, SpeechToText implementations
 │   └── Mapping/                     # AutoMapper profiles (Note, Category, Comment)
-├── DevNotes.Application/        # Application layer (net8.0)
+├── DevNote.Application/        # Application layer (net8.0)
 │   └── Startup.cs                   # AddApplicationServices() — DI registration
-├── DevNotes.Tests/              # Unit tests (net8.0)
+├── DevNote.Tests/              # Unit tests (net8.0)
 │   ├── Services/                    # Repository + API service tests
 │   ├── Models/                      # Domain entity tests
 │   ├── Mappers/                     # AutoMapper profile tests
 │   └── Helpers/                     # Prompt template tests
 ├── GitVersion.yml                   # Semantic versioning config
 ├── global.json                      # .NET SDK version pinning (8.0.100)
-├── DevNotes.sln
+├── DevNote.sln
 └── README.md
 ```
 
@@ -165,7 +165,7 @@ DevNotes/
 ### 1. Copy the configuration template
 
 ```bash
-cp DevNotes/appsettings.example.json DevNotes/appsettings.json
+cp DevNote/appsettings.example.json DevNote/appsettings.json
 ```
 
 ### 2. Edit `appsettings.json`
@@ -203,8 +203,8 @@ cp DevNotes/appsettings.example.json DevNotes/appsettings.json
 #### 1. Clone the repository
 
 ```bash
-git clone https://github.com/landim32/DevNotes.git
-cd DevNotes
+git clone https://github.com/landim32/DevNote.git
+cd DevNote
 ```
 
 #### 2. Install the MAUI workload
@@ -216,27 +216,27 @@ dotnet workload install maui-android
 #### 3. Configure the API key
 
 ```bash
-cp DevNotes/appsettings.example.json DevNotes/appsettings.json
+cp DevNote/appsettings.example.json DevNote/appsettings.json
 # Edit appsettings.json with your OpenAI API key
 ```
 
 #### 4. Build the solution
 
 ```bash
-dotnet build DevNotes.sln
+dotnet build DevNote.sln
 ```
 
 #### 5. Deploy to emulator/device
 
 ```bash
-dotnet build DevNotes/DevNotes.csproj -f net8.0-android -t:Install
-adb shell am start -n br.com.emagine.devnotes/crc648da53556643be544.MainActivity
+dotnet build DevNote/DevNote.csproj -f net8.0-android -t:Install
+adb shell am start -n br.com.emagine.devnote/crc648da53556643be544.MainActivity
 ```
 
 ### Build Release APK
 
 ```bash
-dotnet publish DevNotes/DevNotes.csproj -c Release -f net8.0-android -p:AndroidPackageFormat=apk
+dotnet publish DevNote/DevNote.csproj -c Release -f net8.0-android -p:AndroidPackageFormat=apk
 ```
 
 ---
@@ -247,18 +247,18 @@ dotnet publish DevNotes/DevNotes.csproj -c Release -f net8.0-android -p:AndroidP
 
 **All tests:**
 ```bash
-dotnet test DevNotes.Tests/DevNotes.Tests.csproj
+dotnet test DevNote.Tests/DevNote.Tests.csproj
 ```
 
 **Single test by name:**
 ```bash
-dotnet test DevNotes.Tests/DevNotes.Tests.csproj --filter "FullyQualifiedName~TestMethodName"
+dotnet test DevNote.Tests/DevNote.Tests.csproj --filter "FullyQualifiedName~TestMethodName"
 ```
 
 ### Test Structure
 
 ```
-DevNotes.Tests/
+DevNote.Tests/
 ├── Services/
 │   ├── AIServiceTests.cs              # GPT-4 API mocked HTTP tests
 │   ├── SpeechToTextServiceTests.cs    # Whisper API mocked HTTP tests
@@ -309,22 +309,22 @@ The **Build Android APK** workflow signs the APK using a keystore. You must conf
 |--------|-------------|---------|
 | `ANDROID_KEYSTORE_BASE64` | Keystore file (`.jks`) encoded in base64 | `MIIEvgIBADANBg...` |
 | `ANDROID_KEYSTORE_PASSWORD` | Password used to create the keystore | `your_keystore_password` |
-| `ANDROID_KEY_ALIAS` | Alias of the signing key | `devnotes` |
+| `ANDROID_KEY_ALIAS` | Alias of the signing key | `devnote` |
 | `ANDROID_KEY_PASSWORD` | Password for the signing key | `your_key_password` |
 
 #### Generating the keystore
 
 ```bash
 # 1. Generate the keystore (requires JDK keytool)
-keytool -genkey -v -keystore devnotes.keystore -alias devnotes \
+keytool -genkey -v -keystore devnote.keystore -alias devnote \
   -keyalg RSA -keysize 2048 -validity 10000
 
 # 2. Convert to base64
 # Linux/macOS:
-base64 devnotes.keystore > keystore.b64
+base64 devnote.keystore > keystore.b64
 
 # PowerShell (Windows):
-[Convert]::ToBase64String([IO.File]::ReadAllBytes("devnotes.keystore")) | Set-Content keystore.b64
+[Convert]::ToBase64String([IO.File]::ReadAllBytes("devnote.keystore")) | Set-Content keystore.b64
 ```
 
 Copy the contents of `keystore.b64` into the `ANDROID_KEYSTORE_BASE64` secret.
@@ -377,7 +377,7 @@ Push to main → Version and Tag → Create Release → Build Android APK
 
 **Solution:**
 ```bash
-cp DevNotes/appsettings.example.json DevNotes/appsettings.json
+cp DevNote/appsettings.example.json DevNote/appsettings.json
 ```
 
 #### Audio recording not working on emulator
@@ -397,7 +397,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
 3. Make your changes
-4. Run tests (`dotnet test DevNotes.Tests/DevNotes.Tests.csproj`)
+4. Run tests (`dotnet test DevNote.Tests/DevNote.Tests.csproj`)
 5. Commit your changes (`git commit -m 'feat: add some AmazingFeature'`)
 6. Push to the branch (`git push origin feature/AmazingFeature`)
 7. Open a Pull Request
@@ -436,8 +436,8 @@ This project is licensed under the **MIT License** — see the [LICENSE](LICENSE
 
 ## 📞 Support
 
-- **Issues**: [GitHub Issues](https://github.com/landim32/DevNotes/issues)
-- **Wiki**: [API Documentation](https://github.com/landim32/DevNotes/wiki)
+- **Issues**: [GitHub Issues](https://github.com/landim32/DevNote/issues)
+- **Wiki**: [API Documentation](https://github.com/landim32/DevNote/wiki)
 
 ---
 

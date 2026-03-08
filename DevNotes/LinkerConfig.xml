@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8" ?>
-<linker>
-  <assembly fullname="AutoMapper" preserve="all" />
-  <assembly fullname="DevNotes.Infra" preserve="all" />
-  <assembly fullname="DevNotes.Domain" preserve="all" />
-  <assembly fullname="DevNotes.DTO" preserve="all" />
-</linker>

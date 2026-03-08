@@ -19,7 +19,7 @@
       "Bash(\"$ADB\" shell:*)",
       "Bash(\"$ADB\":*)",
       "Bash(\"$ADB\" devices:*)",
-      "Bash(ADB=\"/c/Program Files \\(x86\\)/Android/android-sdk/platform-tools/adb.exe\"; file \"/c/repos/DevNotes/DevNotes/Resources/AppIcon/appicon_fg.png\" 2>&1; ls -lh \"/c/repos/DevNotes/DevNotes/Resources/AppIcon/appicon_fg.png\" 2>&1)",
+      "Bash(ADB=\"/c/Program Files \\(x86\\)/Android/android-sdk/platform-tools/adb.exe\"; file \"/c/repos/DevNote/DevNote/Resources/AppIcon/appicon_fg.png\" 2>&1; ls -lh \"/c/repos/DevNote/DevNote/Resources/AppIcon/appicon_fg.png\" 2>&1)",
       "Bash(convert:*)",
       "Bash(powershell:*)",
       "Bash(dotnet clean:*)",
@@ -48,12 +48,14 @@
       "Bash(grep:*)",
       "Bash(keytool:*)",
       "Read(//c/Program Files/**)",
-      "Read(//c/repos/DevNotes/$JAVA_HOME/bin/**)",
+      "Read(//c/repos/DevNote/$JAVA_HOME/bin/**)",
       "Bash(\"C:/Program Files/Android/jdk/jdk-8.0.302.8-hotspot/jdk8u302-b08/bin/keytool.exe\":*)",
       "Bash(gh secret:*)",
       "Bash(unzip:*)",
       "Bash(dotnet publish:*)",
-      "Bash(find .:*)"
+      "Bash(find .:*)",
+      "Bash(adb devices:*)",
+      "Bash(cmd.exe:*)"
     ]
   }
 }

@@ -73,25 +73,25 @@ jobs:
         echo "NuGetVersionV2: ${{ steps.gitversion.outputs.nuGetVersionV2 }}"
 
     - name: Create appsettings.json placeholder
-      run: cp DevNotes/appsettings.example.json DevNotes/appsettings.json
+      run: cp DevNote/appsettings.example.json DevNote/appsettings.json
 
     - name: Restore dependencies
-      run: dotnet restore DevNotes.sln
+      run: dotnet restore DevNote.sln
 
     - name: Decode keystore
       run: |
-        echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > ${{ github.workspace }}/devnotes.keystore
+        echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > ${{ github.workspace }}/devnote.keystore
     
     - name: Publish Android APK (signed)
       run: |
-        dotnet publish DevNotes/DevNotes.csproj \
+        dotnet publish DevNote/DevNote.csproj \
           -f net8.0-android \
           -c Release \
           -p:AndroidPackageFormat=apk \
           -p:ApplicationDisplayVersion=${{ steps.gitversion.outputs.nuGetVersionV2 }} \
           -p:ApplicationVersion=${{ github.run_number }} \
           -p:AndroidKeyStore=true \
-          -p:AndroidSigningKeyStore=${{ github.workspace }}/devnotes.keystore \
+          -p:AndroidSigningKeyStore=${{ github.workspace }}/devnote.keystore \
           -p:AndroidSigningKeyAlias=${{ secrets.ANDROID_KEY_ALIAS }} \
           -p:AndroidSigningKeyPass=${{ secrets.ANDROID_KEY_PASSWORD }} \
           -p:AndroidSigningStorePass=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
@@ -100,16 +100,16 @@ jobs:
       id: find_apk
       run: |
         echo "All APKs found:"
-        find DevNotes/bin/Release/net8.0-android -name "*.apk"
-        APK_PATH=$(find DevNotes/bin/Release/net8.0-android -name "*-Signed.apk" | head -1)
+        find DevNote/bin/Release/net8.0-android -name "*.apk"
+        APK_PATH=$(find DevNote/bin/Release/net8.0-android -name "*-Signed.apk" | head -1)
         if [ -z "$APK_PATH" ]; then
           echo "No signed APK found, falling back to any APK"
-          APK_PATH=$(find DevNotes/bin/Release/net8.0-android -name "*.apk" | head -1)
+          APK_PATH=$(find DevNote/bin/Release/net8.0-android -name "*.apk" | head -1)
         fi
         echo "Selected APK: $APK_PATH"
         echo "apk_path=$APK_PATH" >> $GITHUB_OUTPUT
 
-        APK_NAME="DevNotes-v${{ steps.gitversion.outputs.nuGetVersionV2 }}.apk"
+        APK_NAME="DevNote-v${{ steps.gitversion.outputs.nuGetVersionV2 }}.apk"
         cp "$APK_PATH" "$APK_NAME"
         echo "apk_name=$APK_NAME" >> $GITHUB_OUTPUT
 
@@ -121,7 +121,7 @@ jobs:
     - name: Upload APK artifact
       uses: actions/upload-artifact@v4
       with:
-        name: DevNotes-v${{ steps.gitversion.outputs.nuGetVersionV2 }}
+        name: DevNote-v${{ steps.gitversion.outputs.nuGetVersionV2 }}
         path: ${{ steps.find_apk.outputs.apk_name }}
         retention-days: 90
 

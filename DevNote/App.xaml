@@ -1,0 +1,32 @@
+<?xml version = "1.0" encoding = "UTF-8" ?>
+<Application xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:converters="clr-namespace:DevNote.Converters"
+             x:Class="DevNote.App">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Resources/Styles/Colors.xaml" />
+                <ResourceDictionary Source="Resources/Styles/Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <!-- Converters -->
+            <converters:InvertedBoolConverter x:Key="InvertedBoolConverter" />
+            <converters:RecordButtonTextConverter x:Key="RecordButtonTextConverter" />
+            <converters:RecordButtonColorConverter x:Key="RecordButtonColorConverter" />
+            <converters:IsNotZeroConverter x:Key="IsNotZeroConverter" />
+            <converters:CategoryFilterTextConverter x:Key="CategoryFilterTextConverter" />
+            <converters:FabIconConverter x:Key="FabIconConverter" />
+
+            <!-- Chip Button Style -->
+            <Style x:Key="ChipButton" TargetType="Button">
+                <Setter Property="FontSize" Value="13" />
+                <Setter Property="HeightRequest" Value="34" />
+                <Setter Property="CornerRadius" Value="17" />
+                <Setter Property="Padding" Value="14,0" />
+                <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=#FDE8E0, Dark=#2A1510}" />
+                <Setter Property="TextColor" Value="{AppThemeBinding Light=#F07040, Dark=#F8A080}" />
+            </Style>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

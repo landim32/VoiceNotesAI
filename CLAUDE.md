@@ -4,22 +4,22 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-DevNotes is a .NET MAUI Android app (net8.0-android) that records voice notes and structures them automatically using OpenAI's Whisper (speech-to-text) and GPT-4 (note interpretation) APIs. The UI and prompts are in Portuguese (Brazil).
+DevNote is a .NET MAUI Android app (net8.0-android) that records voice notes and structures them automatically using OpenAI's Whisper (speech-to-text) and GPT-4 (note interpretation) APIs. The UI and prompts are in Portuguese (Brazil).
 
 ## Build & Test Commands
 
 ```bash
 # Build entire solution
-dotnet build DevNotes.sln
+dotnet build DevNote.sln
 
 # Run all tests
-dotnet test DevNotes.Tests/DevNotes.Tests.csproj
+dotnet test DevNote.Tests/DevNote.Tests.csproj
 
 # Run a single test by name
-dotnet test DevNotes.Tests/DevNotes.Tests.csproj --filter "FullyQualifiedName~TestMethodName"
+dotnet test DevNote.Tests/DevNote.Tests.csproj --filter "FullyQualifiedName~TestMethodName"
 
 # Build Android APK (release)
-dotnet publish DevNotes/DevNotes.csproj -c Release -f net8.0-android -o output
+dotnet publish DevNote/DevNote.csproj -c Release -f net8.0-android -o output
 
 # First-time setup: install MAUI workload
 dotnet workload install maui-android
@@ -38,25 +38,25 @@ ViewModels → Services (DTOs) → Repositories (Domain Models) → SQLite
 ### Project Structure
 
 ```
-DevNotes.Domain           (net8.0)  — Models + Helpers (no dependencies)
-DevNotes.DTO              (net8.0)  — DTOs with "Info" suffix (no dependencies)
-DevNotes.Infra.Interfaces (net8.0)  — Repository + AppService interfaces (refs Domain + DTO)
-DevNotes.Application      (net8.0)  — Service interfaces + implementations, DI config (refs Domain + DTO + Infra.Interfaces)
-DevNotes.Infra            (net8.0)  — Repository + AppService implementations, Context, AutoMapper Profiles (refs Domain + DTO + Infra.Interfaces)
-DevNotes                  (MAUI)    — UI layer: Pages, ViewModels, Converters (refs all 5)
-DevNotes.Tests            (net8.0)  — Unit tests (refs Domain + DTO + Application + Infra.Interfaces + Infra)
+DevNote.Domain           (net8.0)  — Models + Helpers (no dependencies)
+DevNote.DTO              (net8.0)  — DTOs with "Info" suffix (no dependencies)
+DevNote.Infra.Interfaces (net8.0)  — Repository + AppService interfaces (refs Domain + DTO)
+DevNote.Application      (net8.0)  — Service interfaces + implementations, DI config (refs Domain + DTO + Infra.Interfaces)
+DevNote.Infra            (net8.0)  — Repository + AppService implementations, Context, AutoMapper Profiles (refs Domain + DTO + Infra.Interfaces)
+DevNote                  (MAUI)    — UI layer: Pages, ViewModels, Converters (refs all 5)
+DevNote.Tests            (net8.0)  — Unit tests (refs Domain + DTO + Application + Infra.Interfaces + Infra)
 ```
 
-All projects use `<RootNamespace>DevNotes</RootNamespace>` to share namespaces.
+All projects use `<RootNamespace>DevNote</RootNamespace>` to share namespaces.
 
 ### Key Layers
 
-- **DevNotes.Domain** — `Note`, `NoteResult`, `Category`, `Comment`, `AppSetting` (SQLite entities); `OpenAISettings`, `PromptTemplates` (helpers).
-- **DevNotes.DTO** — `NoteInfo`, `CategoryInfo`, `CommentInfo` (pure data classes, "Info" suffix convention).
-- **DevNotes.Infra.Interfaces** — Repository interfaces (`INoteRepository`, `ICategoryRepository`, `ICommentRepository`, `ISettingsRepository`), AppService interfaces (`IAIService`, `IAudioService`, `ISpeechToTextService`).
-- **DevNotes.Application** — Service interfaces (`INoteService`, `ICategoryService`, `ICommentService`, `ISettingService`), Service implementations (`NoteService`, `CategoryService`, `CommentService`, `SettingService`), DI configuration (`DependencyInjection.AddApplicationServices()`).
-- **DevNotes.Infra** — `AppDatabase` (SQLite wrapper), Repository implementations (`Repository/`), AppService implementations (`AppServices/`: `AIService`, `SpeechToTextService`), AutoMapper profiles (`Mappers/`).
-- **DevNotes (MAUI)** — `AudioService` (only service that stays here, depends on Plugin.Maui.Audio), ViewModels (use DTOs via Service interfaces), Pages (XAML + Shell navigation), Converters.
+- **DevNote.Domain** — `Note`, `NoteResult`, `Category`, `Comment`, `AppSetting` (SQLite entities); `OpenAISettings`, `PromptTemplates` (helpers).
+- **DevNote.DTO** — `NoteInfo`, `CategoryInfo`, `CommentInfo` (pure data classes, "Info" suffix convention).
+- **DevNote.Infra.Interfaces** — Repository interfaces (`INoteRepository`, `ICategoryRepository`, `ICommentRepository`, `ISettingsRepository`), AppService interfaces (`IAIService`, `IAudioService`, `ISpeechToTextService`).
+- **DevNote.Application** — Service interfaces (`INoteService`, `ICategoryService`, `ICommentService`, `ISettingService`), Service implementations (`NoteService`, `CategoryService`, `CommentService`, `SettingService`), DI configuration (`DependencyInjection.AddApplicationServices()`).
+- **DevNote.Infra** — `AppDatabase` (SQLite wrapper), Repository implementations (`Repository/`), AppService implementations (`AppServices/`: `AIService`, `SpeechToTextService`), AutoMapper profiles (`Mappers/`).
+- **DevNote (MAUI)** — `AudioService` (only service that stays here, depends on Plugin.Maui.Audio), ViewModels (use DTOs via Service interfaces), Pages (XAML + Shell navigation), Converters.
 
 ### DI Registration (MauiProgram.cs)
 - **Singleton:** `OpenAISettings`, `AppDatabase`, `HttpClient`, `AudioManager`, all Services, Repositories, and AppServices
