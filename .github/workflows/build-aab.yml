@@ -1,0 +1,147 @@
+name: Build Android AAB
+
+on:
+  workflow_dispatch:
+
+env:
+  DOTNET_VERSION: '8.0.x'
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+    - name: Validate signing secrets
+      run: |
+        MISSING=""
+        if [ -z "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" ]; then MISSING="$MISSING ANDROID_KEYSTORE_BASE64"; fi
+        if [ -z "${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" ]; then MISSING="$MISSING ANDROID_KEYSTORE_PASSWORD"; fi
+        if [ -z "${{ secrets.ANDROID_KEY_ALIAS }}" ]; then MISSING="$MISSING ANDROID_KEY_ALIAS"; fi
+        if [ -z "${{ secrets.ANDROID_KEY_PASSWORD }}" ]; then MISSING="$MISSING ANDROID_KEY_PASSWORD"; fi
+        if [ -n "$MISSING" ]; then
+          echo "::error::Missing required secrets:$MISSING"
+          echo "Configure them in: Settings → Secrets and variables → Actions"
+          exit 1
+        fi
+        echo "✅ All signing secrets are configured"
+
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        submodules: false
+
+    - name: Setup .NET 8
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: Pin .NET 8 SDK only
+      run: |
+        echo '{"sdk":{"version":"8.0.100","rollForward":"latestFeature","allowPrerelease":false}}' > global.json
+        echo "Installed SDKs:"
+        dotnet --list-sdks
+        echo ""
+        echo "Active SDK (pinned to 8.0.x):"
+        dotnet --version
+
+    - name: Install MAUI Android workload
+      run: dotnet workload install maui-android --source https://api.nuget.org/v3/index.json
+
+    - name: Install GitVersion
+      uses: gittools/actions/gitversion/setup@v0.10.2
+      with:
+        versionSpec: '5.x'
+
+    - name: Determine Version
+      id: gitversion
+      uses: gittools/actions/gitversion/execute@v0.10.2
+      with:
+        useConfigFile: true
+        configFilePath: GitVersion.yml
+
+    - name: Display version
+      run: |
+        echo "SemVer: ${{ steps.gitversion.outputs.semVer }}"
+        echo "NuGetVersionV2: ${{ steps.gitversion.outputs.nuGetVersionV2 }}"
+
+    - name: Create appsettings.json with API key
+      run: |
+        cat > DevNote/appsettings.json << 'TEMPLATE'
+        {
+          "OpenAI": {
+            "ApiKey": "OPENAI_KEY_PLACEHOLDER",
+            "Model": "gpt-4o",
+            "WhisperModel": "whisper-1"
+          }
+        }
+        TEMPLATE
+        sed -i "s/OPENAI_KEY_PLACEHOLDER/${{ secrets.OPENAI_API_KEY }}/" DevNote/appsettings.json
+
+    - name: Restore dependencies
+      run: dotnet restore DevNote.sln
+
+    - name: Decode keystore
+      run: |
+        echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > ${{ github.workspace }}/devnote.keystore
+
+    - name: Publish Android AAB (signed)
+      run: |
+        dotnet publish DevNote/DevNote.csproj \
+          -f net8.0-android \
+          -c Release \
+          -p:AndroidPackageFormat=aab \
+          -p:ApplicationDisplayVersion=${{ steps.gitversion.outputs.nuGetVersionV2 }} \
+          -p:ApplicationVersion=${{ github.run_number }} \
+          -p:AndroidKeyStore=true \
+          -p:AndroidSigningKeyStore=${{ github.workspace }}/devnote.keystore \
+          -p:AndroidSigningKeyAlias=${{ secrets.ANDROID_KEY_ALIAS }} \
+          -p:AndroidSigningKeyPass=${{ secrets.ANDROID_KEY_PASSWORD }} \
+          -p:AndroidSigningStorePass=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+
+    - name: Find AAB file
+      id: find_aab
+      run: |
+        echo "All AABs found:"
+        find DevNote/bin/Release/net8.0-android -name "*.aab"
+        AAB_PATH=$(find DevNote/bin/Release/net8.0-android -name "*-Signed.aab" | head -1)
+        if [ -z "$AAB_PATH" ]; then
+          echo "No signed AAB found, falling back to any AAB"
+          AAB_PATH=$(find DevNote/bin/Release/net8.0-android -name "*.aab" | head -1)
+        fi
+        echo "Selected AAB: $AAB_PATH"
+        echo "aab_path=$AAB_PATH" >> $GITHUB_OUTPUT
+
+        AAB_NAME="DevNote-v${{ steps.gitversion.outputs.nuGetVersionV2 }}.aab"
+        cp "$AAB_PATH" "$AAB_NAME"
+        echo "aab_name=$AAB_NAME" >> $GITHUB_OUTPUT
+
+    - name: Upload AAB artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: DevNote-AAB-v${{ steps.gitversion.outputs.nuGetVersionV2 }}
+        path: ${{ steps.find_aab.outputs.aab_name }}
+        retention-days: 90
+
+    - name: Attach AAB to latest release
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        LATEST_RELEASE=$(gh release list --limit 1 --json tagName --jq '.[0].tagName' 2>/dev/null || echo "")
+        if [ -n "$LATEST_RELEASE" ]; then
+          echo "Attaching AAB to release $LATEST_RELEASE"
+          gh release upload "$LATEST_RELEASE" "${{ steps.find_aab.outputs.aab_name }}" --clobber
+        else
+          echo "No GitHub Release found, AAB available as artifact only"
+        fi
+
+    - name: Summary
+      run: |
+        echo "## Android AAB Built" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "- **Version:** \`${{ steps.gitversion.outputs.nuGetVersionV2 }}\`" >> $GITHUB_STEP_SUMMARY
+        echo "- **Build Number:** \`${{ github.run_number }}\`" >> $GITHUB_STEP_SUMMARY
+        echo "- **AAB:** \`${{ steps.find_aab.outputs.aab_name }}\`" >> $GITHUB_STEP_SUMMARY
+        echo "- **SemVer:** \`${{ steps.gitversion.outputs.semVer }}\`" >> $GITHUB_STEP_SUMMARY
