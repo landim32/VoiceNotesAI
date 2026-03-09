@@ -13,12 +13,12 @@
             <!-- Name -->
             <VerticalStackLayout Spacing="4">
                 <Label Text="Nome"
-                       FontSize="13"
+                       FontSize="15"
                        FontAttributes="Bold"
                        TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}" />
                 <Entry Text="{Binding Name}"
                        Placeholder="Nome da categoria"
-                       FontSize="16"
+                       FontSize="18"
                        BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}"
                        TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}"
                        PlaceholderColor="{StaticResource Gray400}" />
@@ -30,7 +30,7 @@
                         Text="Excluir"
                         Command="{Binding DeleteCommand}"
                         IsVisible="{Binding CategoryId, Converter={StaticResource IsNotZeroConverter}}"
-                        FontSize="15"
+                        FontSize="17"
                         HeightRequest="50"
                         CornerRadius="25"
                         BackgroundColor="#E53935"
@@ -40,7 +40,7 @@
                         Text="Salvar"
                         Command="{Binding SaveCommand}"
                         IsEnabled="{Binding IsSaving, Converter={StaticResource InvertedBoolConverter}}"
-                        FontSize="15"
+                        FontSize="17"
                         FontAttributes="Bold"
                         HeightRequest="50"
                         CornerRadius="25"

@@ -20,7 +20,7 @@
 
             <!-- Chip Button Style -->
             <Style x:Key="ChipButton" TargetType="Button">
-                <Setter Property="FontSize" Value="13" />
+                <Setter Property="FontSize" Value="15" />
                 <Setter Property="HeightRequest" Value="34" />
                 <Setter Property="CornerRadius" Value="17" />
                 <Setter Property="Padding" Value="14,0" />

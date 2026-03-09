@@ -3,7 +3,6 @@ using CommunityToolkit.Mvvm.Input;
 using DevNote.DTOs;
 using DevNote.AppServices;
 using DevNote.Helpers;
-using DevNote.Services.Interfaces;
 
 namespace DevNote.ViewModels;
 
@@ -12,20 +11,17 @@ public partial class RecordingViewModel : ObservableObject
     private readonly IAudioAppService _audioService;
     private readonly ISpeechToTextAppService _speechToTextService;
     private readonly INoteService _noteService;
-    private readonly ISettingService _settingService;
     private readonly OpenAISettings _openAISettings;
 
     public RecordingViewModel(
         IAudioAppService audioService,
         ISpeechToTextAppService speechToTextService,
         INoteService noteService,
-        ISettingService settingService,
         OpenAISettings openAISettings)
     {
         _audioService = audioService;
         _speechToTextService = speechToTextService;
         _noteService = noteService;
-        _settingService = settingService;
         _openAISettings = openAISettings;
     }
 
@@ -47,17 +43,12 @@ public partial class RecordingViewModel : ObservableObject
     [RelayCommand]
     private async Task StartRecordingAsync()
     {
-        var apiKey = _openAISettings.ApiKey;
-        if (string.IsNullOrWhiteSpace(apiKey))
-            apiKey = await _settingService.GetAsync(SettingsViewModel.ApiKeySettingKey);
-
-        if (string.IsNullOrWhiteSpace(apiKey))
+        if (string.IsNullOrWhiteSpace(_openAISettings.ApiKey))
         {
             await Shell.Current.DisplayAlert(
                 "Configuração necessária",
-                "A chave da API do OpenAI não está configurada. Configure-a nas opções antes de gravar.",
-                "Ir para Opções");
-            await Shell.Current.GoToAsync("//SettingsPage");
+                "A chave da API do OpenAI não está configurada. Configure-a no arquivo appsettings.json.",
+                "OK");
             return;
         }
 

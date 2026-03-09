@@ -11,7 +11,6 @@ public partial class SettingsViewModel : ObservableObject
     private readonly ISettingService _settingService;
     private readonly OpenAISettings _openAISettings;
 
-    public const string ApiKeySettingKey = "OpenAI_ApiKey";
     public const string WhisperModelSettingKey = "OpenAI_WhisperModel";
     public const string GptModelSettingKey = "OpenAI_Model";
 
@@ -20,9 +19,6 @@ public partial class SettingsViewModel : ObservableObject
         _settingService = settingService;
         _openAISettings = openAISettings;
     }
-
-    [ObservableProperty]
-    private string _apiKey = string.Empty;
 
     [ObservableProperty]
     private string _whisperModel = string.Empty;
@@ -61,7 +57,6 @@ public partial class SettingsViewModel : ObservableObject
 
         try
         {
-            ApiKey = await _settingService.GetAsync(ApiKeySettingKey) ?? _openAISettings.ApiKey;
             WhisperModel = await _settingService.GetAsync(WhisperModelSettingKey) ?? _openAISettings.WhisperModel;
             GptModel = await _settingService.GetAsync(GptModelSettingKey) ?? _openAISettings.Model;
         }
@@ -74,22 +69,14 @@ public partial class SettingsViewModel : ObservableObject
     [RelayCommand]
     private async Task SaveSettingsAsync()
     {
-        if (string.IsNullOrWhiteSpace(ApiKey))
-        {
-            await Shell.Current.DisplayAlert("Erro", "A chave da API é obrigatória.", "OK");
-            return;
-        }
-
         IsSaving = true;
 
         try
         {
-            await _settingService.SetAsync(ApiKeySettingKey, ApiKey.Trim());
             await _settingService.SetAsync(WhisperModelSettingKey, WhisperModel.Trim());
             await _settingService.SetAsync(GptModelSettingKey, GptModel.Trim());
 
             // Update the in-memory settings so services pick up changes
-            _openAISettings.ApiKey = ApiKey.Trim();
             _openAISettings.WhisperModel = WhisperModel.Trim();
             _openAISettings.Model = GptModel.Trim();
 

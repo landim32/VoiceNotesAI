@@ -8,9 +8,9 @@
              Title="Notas"
              BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}">
 
-    <Grid Padding="16">
+    <Grid>
 
-        <Grid RowDefinitions="Auto,*">
+        <Grid RowDefinitions="Auto,*" Padding="16">
             <!-- Category Filter -->
             <ScrollView Orientation="Horizontal" HorizontalScrollBarVisibility="Never" Grid.Row="0">
                 <HorizontalStackLayout Spacing="8" Padding="0,0,0,12"
@@ -41,15 +41,15 @@
                                  HorizontalOptions="Center"
                                  Spacing="12">
                 <Label Text="🎙️"
-                       FontSize="48"
+                       FontSize="52"
                        HorizontalOptions="Center" />
                 <Label Text="Nenhuma nota ainda"
-                       FontSize="18"
+                       FontSize="20"
                        FontAttributes="Bold"
                        HorizontalOptions="Center"
                        TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}" />
                 <Label Text="Grave sua primeira nota de voz!"
-                       FontSize="14"
+                       FontSize="16"
                        HorizontalOptions="Center"
                        TextColor="{AppThemeBinding Light={StaticResource Gray400}, Dark={StaticResource Gray400}}" />
             </VerticalStackLayout>
@@ -84,13 +84,13 @@
 
                                 <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="8">
                                     <Label Text="{Binding Title}"
-                                           FontSize="16"
+                                           FontSize="18"
                                            FontAttributes="Bold"
                                            TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}"
                                            Grid.Row="0" Grid.Column="0" />
 
                                     <Label Text="{Binding Category}"
-                                           FontSize="11"
+                                           FontSize="13"
                                            Padding="8,2"
                                            TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"
                                            BackgroundColor="{AppThemeBinding Light=#FDE8E0, Dark=#2A1510}"
@@ -98,7 +98,7 @@
                                            VerticalOptions="Center" />
 
                                     <Label Text="{Binding Description}"
-                                           FontSize="13"
+                                           FontSize="15"
                                            MaxLines="2"
                                            LineBreakMode="TailTruncation"
                                            TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}"
@@ -106,7 +106,7 @@
                                            Margin="0,4,0,0" />
 
                                     <Label Text="{Binding CreatedAt, StringFormat='{0:dd/MM/yyyy HH:mm}'}"
-                                           FontSize="11"
+                                           FontSize="13"
                                            TextColor="{AppThemeBinding Light={StaticResource Gray400}, Dark={StaticResource Gray500}}"
                                            Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
                                            Margin="0,4,0,0" />
@@ -139,7 +139,7 @@
             <!-- Text Note Option -->
             <HorizontalStackLayout Spacing="10" HorizontalOptions="End">
                 <Label Text="Nota de Texto"
-                       FontSize="14"
+                       FontSize="16"
                        FontAttributes="Bold"
                        TextColor="{StaticResource White}"
                        VerticalOptions="Center"
@@ -171,7 +171,7 @@
             <!-- Voice Note Option -->
             <HorizontalStackLayout Spacing="10" HorizontalOptions="End">
                 <Label Text="Nota de Voz"
-                       FontSize="14"
+                       FontSize="16"
                        FontAttributes="Bold"
                        TextColor="{StaticResource White}"
                        VerticalOptions="Center"
@@ -215,7 +215,7 @@
                 <TapGestureRecognizer Command="{Binding ToggleFabMenuCommand}" />
             </Border.GestureRecognizers>
             <Label Text="{Binding IsFabMenuOpen, Converter={StaticResource FabIconConverter}}"
-                   FontSize="28"
+                   FontSize="30"
                    TextColor="White"
                    HorizontalOptions="Center"
                    VerticalOptions="Center" />
