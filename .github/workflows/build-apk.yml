@@ -72,8 +72,18 @@ jobs:
         echo "SemVer: ${{ steps.gitversion.outputs.semVer }}"
         echo "NuGetVersionV2: ${{ steps.gitversion.outputs.nuGetVersionV2 }}"
 
-    - name: Create appsettings.json placeholder
-      run: cp DevNote/appsettings.example.json DevNote/appsettings.json
+    - name: Create appsettings.json with API key
+      run: |
+        cat > DevNote/appsettings.json << 'TEMPLATE'
+        {
+          "OpenAI": {
+            "ApiKey": "OPENAI_KEY_PLACEHOLDER",
+            "Model": "gpt-4o",
+            "WhisperModel": "whisper-1"
+          }
+        }
+        TEMPLATE
+        sed -i "s/OPENAI_KEY_PLACEHOLDER/${{ secrets.OPENAI_API_KEY }}/" DevNote/appsettings.json
 
     - name: Restore dependencies
       run: dotnet restore DevNote.sln
