@@ -458,6 +458,24 @@ public partial class NoteDetailViewModel : ObservableObject, IQueryAttributable
     }
 
     [RelayCommand]
+    private async Task CopyToClipboardAsync()
+    {
+        var parts = new List<string>();
+
+        if (!string.IsNullOrWhiteSpace(Description))
+            parts.Add(Description);
+
+        foreach (var comment in Comments)
+        {
+            if (!string.IsNullOrWhiteSpace(comment.Content))
+                parts.Add(comment.Content);
+        }
+
+        var text = string.Join("\n---\n", parts);
+        await Clipboard.Default.SetTextAsync(text);
+    }
+
+    [RelayCommand]
     private async Task GoBackAsync()
     {
         await Shell.Current.GoToAsync("..");

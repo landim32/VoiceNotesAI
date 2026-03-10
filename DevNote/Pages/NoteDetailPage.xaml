@@ -13,11 +13,31 @@
         <ScrollView Padding="20">
             <VerticalStackLayout Spacing="16">
 
-                <!-- Created At -->
-                <Label Text="{Binding CreatedAt, StringFormat='Criada em {0:dd/MM/yyyy HH:mm}'}"
-                       FontSize="14"
-                       IsVisible="{Binding IsNewNote, Converter={StaticResource InvertedBoolConverter}}"
-                       TextColor="{AppThemeBinding Light={StaticResource Gray400}, Dark={StaticResource Gray500}}" />
+                <!-- Created At + Copy Button -->
+                <Grid ColumnDefinitions="*,Auto"
+                      IsVisible="{Binding IsNewNote, Converter={StaticResource InvertedBoolConverter}}">
+                    <Label Text="{Binding CreatedAt, StringFormat='Criada em {0:dd/MM/yyyy HH:mm}'}"
+                           FontSize="14"
+                           VerticalOptions="Center"
+                           TextColor="{AppThemeBinding Light={StaticResource Gray400}, Dark={StaticResource Gray500}}" />
+                    <Border Grid.Column="1"
+                            StrokeThickness="0"
+                            WidthRequest="36"
+                            HeightRequest="36"
+                            BackgroundColor="Transparent"
+                            StrokeShape="RoundRectangle 18">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding CopyToClipboardCommand}" />
+                        </Border.GestureRecognizers>
+                        <Path Data="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"
+                              Fill="{AppThemeBinding Light={StaticResource Gray400}, Dark={StaticResource Gray500}}"
+                              Aspect="Uniform"
+                              WidthRequest="20"
+                              HeightRequest="20"
+                              HorizontalOptions="Center"
+                              VerticalOptions="Center" />
+                    </Border>
+                </Grid>
 
                 <!-- Notas (Description - primary field) -->
                 <VerticalStackLayout Spacing="4">
