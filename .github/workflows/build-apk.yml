@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 env:
-  DOTNET_VERSION: '8.0.x'
+  DOTNET_VERSION: '9.0.x'
 
 jobs:
   build-android:
@@ -38,18 +38,18 @@ jobs:
         fetch-depth: 0
         submodules: false
 
-    - name: Setup .NET 8
+    - name: Setup .NET 9
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
 
-    - name: Pin .NET 8 SDK only
+    - name: Pin .NET 9 SDK only
       run: |
-        echo '{"sdk":{"version":"8.0.100","rollForward":"latestFeature","allowPrerelease":false}}' > global.json
+        echo '{"sdk":{"version":"9.0.100","rollForward":"latestFeature","allowPrerelease":false}}' > global.json
         echo "Installed SDKs:"
         dotnet --list-sdks
         echo ""
-        echo "Active SDK (pinned to 8.0.x):"
+        echo "Active SDK (pinned to 9.0.x):"
         dotnet --version
 
     - name: Install MAUI Android workload
@@ -95,7 +95,7 @@ jobs:
     - name: Publish Android APK (signed)
       run: |
         dotnet publish DevNote/DevNote.csproj \
-          -f net8.0-android \
+          -f net9.0-android \
           -c Release \
           -p:AndroidPackageFormat=apk \
           -p:ApplicationDisplayVersion=${{ steps.gitversion.outputs.nuGetVersionV2 }} \
@@ -110,11 +110,11 @@ jobs:
       id: find_apk
       run: |
         echo "All APKs found:"
-        find DevNote/bin/Release/net8.0-android -name "*.apk"
-        APK_PATH=$(find DevNote/bin/Release/net8.0-android -name "*-Signed.apk" | head -1)
+        find DevNote/bin/Release/net9.0-android -name "*.apk"
+        APK_PATH=$(find DevNote/bin/Release/net9.0-android -name "*-Signed.apk" | head -1)
         if [ -z "$APK_PATH" ]; then
           echo "No signed APK found, falling back to any APK"
-          APK_PATH=$(find DevNote/bin/Release/net8.0-android -name "*.apk" | head -1)
+          APK_PATH=$(find DevNote/bin/Release/net9.0-android -name "*.apk" | head -1)
         fi
         echo "Selected APK: $APK_PATH"
         echo "apk_path=$APK_PATH" >> $GITHUB_OUTPUT

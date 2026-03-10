@@ -63,7 +63,8 @@
       "Read(//c/repos/DevNote/$LOCALAPPDATA/Android/Sdk/platform-tools/**)",
       "Bash(where adb.exe)",
       "Read(//c/Users/rodri/**)",
-      "Bash(\"/c/Program Files \\(x86\\)/Android/android-sdk/platform-tools/adb.exe\" logcat:*)"
+      "Bash(\"/c/Program Files \\(x86\\)/Android/android-sdk/platform-tools/adb.exe\" logcat:*)",
+      "Bash(dotnet:*)"
     ]
   }
 }

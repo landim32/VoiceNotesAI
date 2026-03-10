@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 env:
-  DOTNET_VERSION: '8.0.x'
+  DOTNET_VERSION: '9.0.x'
 
 jobs:
   build-android:
@@ -33,18 +33,18 @@ jobs:
         fetch-depth: 0
         submodules: false
 
-    - name: Setup .NET 8
+    - name: Setup .NET 9
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
 
-    - name: Pin .NET 8 SDK only
+    - name: Pin .NET 9 SDK only
       run: |
-        echo '{"sdk":{"version":"8.0.100","rollForward":"latestFeature","allowPrerelease":false}}' > global.json
+        echo '{"sdk":{"version":"9.0.100","rollForward":"latestFeature","allowPrerelease":false}}' > global.json
         echo "Installed SDKs:"
         dotnet --list-sdks
         echo ""
-        echo "Active SDK (pinned to 8.0.x):"
+        echo "Active SDK (pinned to 9.0.x):"
         dotnet --version
 
     - name: Install MAUI Android workload
@@ -90,7 +90,7 @@ jobs:
     - name: Publish Android AAB (signed)
       run: |
         dotnet publish DevNote/DevNote.csproj \
-          -f net8.0-android \
+          -f net9.0-android \
           -c Release \
           -p:AndroidPackageFormat=aab \
           -p:ApplicationDisplayVersion=${{ steps.gitversion.outputs.nuGetVersionV2 }} \
@@ -105,11 +105,11 @@ jobs:
       id: find_aab
       run: |
         echo "All AABs found:"
-        find DevNote/bin/Release/net8.0-android -name "*.aab"
-        AAB_PATH=$(find DevNote/bin/Release/net8.0-android -name "*-Signed.aab" | head -1)
+        find DevNote/bin/Release/net9.0-android -name "*.aab"
+        AAB_PATH=$(find DevNote/bin/Release/net9.0-android -name "*-Signed.aab" | head -1)
         if [ -z "$AAB_PATH" ]; then
           echo "No signed AAB found, falling back to any AAB"
-          AAB_PATH=$(find DevNote/bin/Release/net8.0-android -name "*.aab" | head -1)
+          AAB_PATH=$(find DevNote/bin/Release/net9.0-android -name "*.aab" | head -1)
         fi
         echo "Selected AAB: $AAB_PATH"
         echo "aab_path=$AAB_PATH" >> $GITHUB_OUTPUT
